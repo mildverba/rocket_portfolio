@@ -74,60 +74,80 @@ export async function POST(req: NextRequest) {
       console.warn("[API] Failed to fetch live EURGBP rate, using default 0.85");
     }
 
-    // 1. Fetch Crypto Prices (Robust Dynamic Mapping: {TICKER}USDC -> {TICKER}USDT -> 0)
+    // 1. Fetch Crypto Prices (Waterfall: Binance -> CryptoCompare -> CoinGecko)
     if (cryptos.length > 0) {
       for (const asset of updatedAssets) {
         if (asset.group !== "Crypto") continue;
         
         const rawTicker = asset.ticker.toUpperCase().trim();
-        // Defensive: Strip common suffixes if they entered the sheet by mistake
         let baseTicker = rawTicker.replace(/(USDT|USDC|USD)$/, "");
-        
-        // Specific user mappings
         if (baseTicker === "TONCOIN") baseTicker = "TON";
         if (baseTicker === "ONDO") baseTicker = "ONDO";
-        
+
         let priceFound = false;
+        let priceInUsd = 0;
 
-        // --- STEP A: DEFINE PAIRS TO TRY ---
-        const pairsToTry = [`${baseTicker}USDC`, `${baseTicker}USDT`];
-        const binanceMirrors = [
-          "https://api.binance.com",
-          "https://api1.binance.com",
-          "https://api3.binance.com"
-        ];
-
-        for (const symbol of pairsToTry) {
+        // --- PHASE A: BINANCE MIRROR CLUSTER ---
+        const binanceMirrors = ["https://api.binance.com", "https://api1.binance.com", "https://api3.binance.com"];
+        for (const mirror of binanceMirrors) {
           if (priceFound) break;
-
-          for (const mirror of binanceMirrors) {
-            if (priceFound) break;
-            const url = `${mirror}/api/v3/ticker/price?symbol=${symbol}`;
-            try {
-              console.log(`[API] Trying Binance URL: ${url}`);
-              const res = await fetch(url, {
-                signal: AbortSignal.timeout(3000),
-                headers: { "User-Agent": "Mozilla/5.0 RocketPortfolio/1.3 (Production)" }
-              });
-
-              if (res.ok) {
-                const data = await res.json();
-                const priceUsd = parseFloat(data.price);
-                if (priceUsd > 0) {
-                  asset.currentPrice = priceUsd / eurUsdRate;
-                  console.log(`[API] SUCCESS (Binance): ${symbol} = ${priceUsd} USD (${asset.currentPrice} EUR)`);
-                  priceFound = true;
-                }
+          const url = `${mirror}/api/v3/ticker/price?symbol=${baseTicker}USDT`;
+          try {
+            const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
+            if (res.ok) {
+              const data = await res.json();
+              priceInUsd = parseFloat(data.price);
+              if (priceInUsd > 0) {
+                console.log(`[API] SUCCESS (Binance): ${baseTicker} = $${priceInUsd}`);
+                priceFound = true;
               }
-            } catch (err) {
-              // Try next mirror/pair
             }
+          } catch (e) {}
+        }
+
+        // --- PHASE B: CRYPTOCOMPARE (Proxy-Safe Fallback) ---
+        if (!priceFound) {
+          const ccUrl = `https://min-api.cryptocompare.com/data/price?fsym=${baseTicker}&tsyms=USD`;
+          try {
+            console.log(`[API] Trying CryptoCompare Waterfall: ${ccUrl}`);
+            const res = await fetch(ccUrl, { signal: AbortSignal.timeout(4000) });
+            if (res.ok) {
+              const data = await res.json();
+              if (data.USD && data.USD > 0) {
+                priceInUsd = data.USD;
+                console.log(`[API] SUCCESS (CryptoCompare): ${baseTicker} = $${priceInUsd}`);
+                priceFound = true;
+              }
+            }
+          } catch (e) {
+            console.error(`[API] FAILED (CryptoCompare) for ${baseTicker}`);
           }
         }
 
-        // --- STEP B: NO FALLBACK (Strict 0 and Log Error) ---
+        // --- PHASE C: COINGECKO ---
         if (!priceFound) {
-          console.error(`[API ERROR] Could not find price for ticker: ${rawTicker} (Tried ${pairsToTry.join(", ")})`);
+          const geckoMap: Record<string, string> = { "TON": "the-open-network", "ONDO": "ondo-finance", "BTC": "bitcoin" };
+          const geckoId = geckoMap[baseTicker] || baseTicker.toLowerCase();
+          const geckoUrl = `https://api.coingecko.com/api/v3/simple/price?ids=${geckoId}&vs_currencies=usd`;
+          try {
+            console.log(`[API] Trying CoinGecko Waterfall: ${geckoUrl}`);
+            const res = await fetch(geckoUrl, { signal: AbortSignal.timeout(5000) });
+            if (res.ok) {
+              const data = await res.json();
+              if (data[geckoId]?.usd) {
+                priceInUsd = data[geckoId].usd;
+                console.log(`[API] SUCCESS (CoinGecko): ${baseTicker} = $${priceInUsd}`);
+                priceFound = true;
+              }
+            }
+          } catch (e) {}
+        }
+
+        // Final Step: Convert to EUR
+        if (priceFound && priceInUsd > 0) {
+          asset.currentPrice = priceInUsd / eurUsdRate;
+        } else {
+          console.error(`[API ERROR] ALL SOURCES FAILED for ${rawTicker}. Setting to 0.`);
           asset.currentPrice = 0;
         }
       }

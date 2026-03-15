@@ -403,7 +403,7 @@ return (
                         <td className="px-4 py-7 text-right font-mono text-xs text-slate-400 tabular-nums">
                           €{asset.avgPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}
                         </td>
-                        <td className={`px-4 py-7 text-right font-mono text-xs tabular-nums ${asset.currentPrice === 0 ? "text-red-600 font-bold" : "font-extrabold text-[#111827]"}`}>
+                        <td className={`px-4 py-7 text-right font-mono text-xs tabular-nums ${asset.currentPrice === 0 ? "text-blue-600 font-bold" : "font-extrabold text-[#111827]"}`}>
                           €{asset.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}
                         </td>
                         <td className="px-4 py-7 text-right">
