@@ -74,81 +74,63 @@ export async function POST(req: NextRequest) {
       console.warn("[API] Failed to fetch live EURGBP rate, using default 0.85");
     }
 
-    // 1. Fetch Crypto Prices (Waterfall: Binance -> CryptoCompare -> CoinGecko)
+    // 1. Fetch Crypto Prices (CMC Batch -> Sheet Fallback -> 0)
     if (cryptos.length > 0) {
+      const cmcApiKey = process.env.CMC_API_KEY;
+      // Get unique sanitized tickers for batch fetch
+      const tickers = cryptos.map(a => 
+        a.ticker.toUpperCase()
+          .replace(/[\$\s]/g, "")
+          .replace(/(USDT|USDC|USD)$/, "")
+      );
+      const uniqueTickers = [...new Set(tickers)].join(",");
+      
+      let cmcData: any = null;
+      if (cmcApiKey && uniqueTickers) {
+        try {
+          // Note: CMC supports symbol batching
+          const url = `https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest?symbol=${uniqueTickers}`;
+          console.log(`[API] CMC Batch Fetching: ${uniqueTickers}`);
+          const cmcRes = await fetch(url, {
+            headers: { "X-CMC_PRO_API_KEY": cmcApiKey },
+            signal: AbortSignal.timeout(6000)
+          });
+
+          if (cmcRes.ok) {
+            const json = await cmcRes.json();
+            cmcData = json.data;
+          } else {
+            console.warn(`[API ERROR] CMC HTTP ${cmcRes.status}`);
+          }
+        } catch (err) {
+          console.error("[API ERROR] CMC Fetch Failed:", err);
+        }
+      }
+
       for (const asset of updatedAssets) {
         if (asset.group !== "Crypto") continue;
         
-        const rawTicker = asset.ticker.toUpperCase().trim();
+        const rawTicker = asset.ticker.toUpperCase().replace(/[\$\s]/g, "");
         let baseTicker = rawTicker.replace(/(USDT|USDC|USD)$/, "");
         if (baseTicker === "TONCOIN") baseTicker = "TON";
-        if (baseTicker === "ONDO") baseTicker = "ONDO";
 
-        let priceFound = false;
-        let priceInUsd = 0;
+        const cmcQuote = cmcData && cmcData[baseTicker];
 
-        // --- PHASE A: BINANCE MIRROR CLUSTER ---
-        const binanceMirrors = ["https://api.binance.com", "https://api1.binance.com", "https://api3.binance.com"];
-        for (const mirror of binanceMirrors) {
-          if (priceFound) break;
-          const url = `${mirror}/api/v3/ticker/price?symbol=${baseTicker}USDT`;
-          try {
-            const res = await fetch(url, { signal: AbortSignal.timeout(3000) });
-            if (res.ok) {
-              const data = await res.json();
-              priceInUsd = parseFloat(data.price);
-              if (priceInUsd > 0) {
-                console.log(`[API] SUCCESS (Binance): ${baseTicker} = $${priceInUsd}`);
-                priceFound = true;
-              }
-            }
-          } catch (e) {}
-        }
-
-        // --- PHASE B: CRYPTOCOMPARE (Proxy-Safe Fallback) ---
-        if (!priceFound) {
-          const ccUrl = `https://min-api.cryptocompare.com/data/price?fsym=${baseTicker}&tsyms=USD`;
-          try {
-            console.log(`[API] Trying CryptoCompare Waterfall: ${ccUrl}`);
-            const res = await fetch(ccUrl, { signal: AbortSignal.timeout(4000) });
-            if (res.ok) {
-              const data = await res.json();
-              if (data.USD && data.USD > 0) {
-                priceInUsd = data.USD;
-                console.log(`[API] SUCCESS (CryptoCompare): ${baseTicker} = $${priceInUsd}`);
-                priceFound = true;
-              }
-            }
-          } catch (e) {
-            console.error(`[API] FAILED (CryptoCompare) for ${baseTicker}`);
-          }
-        }
-
-        // --- PHASE C: COINGECKO ---
-        if (!priceFound) {
-          const geckoMap: Record<string, string> = { "TON": "the-open-network", "ONDO": "ondo-finance", "BTC": "bitcoin" };
-          const geckoId = geckoMap[baseTicker] || baseTicker.toLowerCase();
-          const geckoUrl = `https://api.coingecko.com/api/v3/simple/price?ids=${geckoId}&vs_currencies=usd`;
-          try {
-            console.log(`[API] Trying CoinGecko Waterfall: ${geckoUrl}`);
-            const res = await fetch(geckoUrl, { signal: AbortSignal.timeout(5000) });
-            if (res.ok) {
-              const data = await res.json();
-              if (data[geckoId]?.usd) {
-                priceInUsd = data[geckoId].usd;
-                console.log(`[API] SUCCESS (CoinGecko): ${baseTicker} = $${priceInUsd}`);
-                priceFound = true;
-              }
-            }
-          } catch (e) {}
-        }
-
-        // Final Step: Convert to EUR
-        if (priceFound && priceInUsd > 0) {
-          asset.currentPrice = priceInUsd / eurUsdRate;
+        if (cmcQuote && cmcQuote.quote && cmcQuote.quote.USD) {
+          const priceUsd = cmcQuote.quote.USD.price;
+          asset.currentPrice = priceUsd / eurUsdRate;
+          asset.priceSource = 'api';
+          console.log(`[API] CMC SUCCESS: ${baseTicker} = $${priceUsd.toFixed(4)}`);
         } else {
-          console.error(`[API ERROR] ALL SOURCES FAILED for ${rawTicker}. Setting to 0.`);
-          asset.currentPrice = 0;
+          // FALLBACK: Use Google Sheet value if available
+          if (asset.currentPrice && asset.currentPrice > 0) {
+            asset.priceSource = 'sheet';
+            console.log(`[API] CMC FAIL: Using Sheet Backup for ${baseTicker} (€${asset.currentPrice})`);
+          } else {
+            asset.priceSource = 'none';
+            asset.currentPrice = 0;
+            console.error(`[API] TOTAL ERROR: No price for ${baseTicker}`);
+          }
         }
       }
     }
