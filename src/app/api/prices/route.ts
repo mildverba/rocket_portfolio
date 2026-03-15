@@ -74,15 +74,21 @@ export async function POST(req: NextRequest) {
       console.warn("[API] Failed to fetch live EURGBP rate, using default 0.85");
     }
 
-    // 1. Fetch Crypto Prices (Robust Multi-Source)
+    // 1. Fetch Crypto Prices (Ultra-Robust: Binance Mirror -> CoinGecko -> Sheet Fallback)
     if (cryptos.length > 0) {
       for (const asset of updatedAssets) {
         if (asset.group !== "Crypto") continue;
         
-        const ticker = asset.ticker.toUpperCase().trim();
+        const rawTicker = asset.ticker.toUpperCase().trim();
         let priceFound = false;
 
-        // --- SOURCE A: BINANCE (Multiple Mirrors) ---
+        // --- STEP A: MAP TICKERS FOR BINANCE ---
+        let binanceSymbol = rawTicker;
+        if (binanceSymbol === "TONCOIN" || binanceSymbol === "TON") binanceSymbol = "TON";
+        if (binanceSymbol === "ONDO") binanceSymbol = "ONDO";
+        binanceSymbol = `${binanceSymbol}USDT`;
+
+        // --- STEP B: BINANCE MIRRORS ---
         const binanceMirrors = [
           "https://api.binance.com",
           "https://api1.binance.com",
@@ -91,10 +97,12 @@ export async function POST(req: NextRequest) {
 
         for (const mirror of binanceMirrors) {
           if (priceFound) break;
+          const url = `${mirror}/api/v3/ticker/price?symbol=${binanceSymbol}`;
           try {
-            const res = await fetch(`${mirror}/api/v3/ticker/price?symbol=${ticker}USDT`, {
-              signal: AbortSignal.timeout(3000), // Don't hang the function
-              headers: { "User-Agent": "Mozilla/5.0 RocketPortfolioScanner/1.0" }
+            console.log(`[API] Trying Binance URL: ${url}`);
+            const res = await fetch(url, {
+              signal: AbortSignal.timeout(3000),
+              headers: { "User-Agent": "Mozilla/5.0 RocketPortfolio/1.1 (Production)" }
             });
 
             if (res.ok) {
@@ -102,39 +110,60 @@ export async function POST(req: NextRequest) {
               const priceUsdt = parseFloat(data.price);
               if (priceUsdt > 0) {
                 asset.currentPrice = priceUsdt / eurUsdRate;
-                console.log(`[API] SUCCESS: Binance (${mirror}) ${ticker}: ${priceUsdt} USDT -> ${asset.currentPrice} EUR`);
+                console.log(`[API] SUCCESS (Binance): ${binanceSymbol} = ${priceUsdt} USDT (${asset.currentPrice} EUR)`);
                 priceFound = true;
               }
             } else {
-              console.log(`[API] Binance Mirror Failed (${mirror}): HTTP ${res.status}`);
+               console.warn(`[API] Binance Mirror HTTP Fail: ${res.status} for ${url}`);
             }
           } catch (err) {
-             console.warn(`[API] Binance Mirror Exception (${mirror}):`, err instanceof Error ? err.message : "Network error");
+            console.warn(`[API] Binance Mirror Exception: ${err instanceof Error ? err.message : "Network error"}`);
           }
         }
 
-        // --- SOURCE B: YAHOO FINANCE FALLBACK ---
+        // --- STEP C: COINGECKO FALLBACK ---
         if (!priceFound) {
+          // Mapping for CoinGecko IDs
+          const geckoMap: Record<string, string> = {
+            "BTC": "bitcoin",
+            "ETH": "ethereum",
+            "TON": "the-open-network",
+            "TONCOIN": "the-open-network",
+            "ONDO": "ondo-finance",
+            "SOL": "solana",
+            "USDT": "tether"
+          };
+          
+          const geckoId = geckoMap[rawTicker] || rawTicker.toLowerCase();
+          const geckoUrl = `https://api.coingecko.com/api/v3/simple/price?ids=${geckoId}&vs_currencies=usd`;
+          
           try {
-            // Map common crypto tickers to Yahoo Finance format
-            let yahooTicker = `${ticker}-USD`;
-            if (ticker === "TON") yahooTicker = "TON11419-USD"; // Accurate Yahoo ID for TON
-            if (ticker === "ONDO") yahooTicker = "ONDO-USD";
-
-            console.log(`[API] FALLBACK: Trying Yahoo for ${ticker} (${yahooTicker})`);
-            const quote = await yahooInstance.quote(yahooTicker);
-            if (quote && quote.regularMarketPrice) {
-              asset.currentPrice = quote.regularMarketPrice / eurUsdRate;
-              console.log(`[API] SUCCESS: Yahoo Fallback ${ticker}: ${quote.regularMarketPrice} USD -> ${asset.currentPrice} EUR`);
-              priceFound = true;
+            console.log(`[API] TRYING COINGECKO FALLBACK: ${geckoUrl}`);
+            const res = await fetch(geckoUrl, { signal: AbortSignal.timeout(4000) });
+            if (res.ok) {
+              const data = await res.json();
+              const priceUsd = data[geckoId]?.usd;
+              if (priceUsd && priceUsd > 0) {
+                asset.currentPrice = priceUsd / eurUsdRate;
+                console.log(`[API] SUCCESS (CoinGecko): ${geckoId} = ${priceUsd} USD (${asset.currentPrice} EUR)`);
+                priceFound = true;
+              }
             }
           } catch (err) {
-            console.error(`[API] Yahoo Fallback Failed for ${ticker}:`, err instanceof Error ? err.message : "Unknown error");
+            console.warn(`[API] CoinGecko Fallback Failed: ${err instanceof Error ? err.message : "Error"}`);
           }
         }
 
+        // --- STEP D: GOOGLE SHEET FALLBACK (LAST RESORT) ---
         if (!priceFound) {
-          console.error(`[API] FATAL: Could not fetch price for ${ticker} from any source.`);
+          if (asset.currentPrice && asset.currentPrice > 0) {
+            console.log(`[API] USING SHEET FALLBACK for ${rawTicker}: €${asset.currentPrice}`);
+            // No need to set asset.currentPrice as it's already there from the sheet data
+            priceFound = true;
+          } else {
+            console.error(`[API] TOTAL FAILURE: No price found for ${rawTicker} (Binance, CoinGecko, and Sheet all failed)`);
+            asset.currentPrice = 0;
+          }
         }
       }
     }
@@ -169,11 +198,14 @@ export async function POST(req: NextRequest) {
             }
             console.log(`[API] ${ticker} final EUR: ${asset.currentPrice}`);
           } else {
-            asset.currentPrice = 0;
+            // Check sheet fallback for stocks too if Yahoo fails
+            if (!asset.currentPrice || asset.currentPrice === 0) {
+               asset.currentPrice = 0;
+            }
           }
         } catch (err) {
           console.error(`[API] Yahoo fetch failed for ${asset.ticker}`, err);
-          asset.currentPrice = 0;
+          // Last resort fallback to sheet price for stocks too
         }
       }
     }
