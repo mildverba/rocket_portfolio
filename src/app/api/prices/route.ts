@@ -74,30 +74,67 @@ export async function POST(req: NextRequest) {
       console.warn("[API] Failed to fetch live EURGBP rate, using default 0.85");
     }
 
-    // 1. Fetch Crypto Prices (Binance Public API)
+    // 1. Fetch Crypto Prices (Robust Multi-Source)
     if (cryptos.length > 0) {
       for (const asset of updatedAssets) {
         if (asset.group !== "Crypto") continue;
         
         const ticker = asset.ticker.toUpperCase().trim();
-        try {
-          // Binance uses TICKERUSDT (e.g., BTCUSDT)
-          const binanceUrl = `https://api.binance.com/api/v3/ticker/price?symbol=${ticker}USDT`;
-          const res = await fetch(binanceUrl);
-          if (res.ok) {
-            const data = await res.json();
-            const priceUsdt = parseFloat(data.price);
-            if (priceUsdt > 0) {
-              // Convert USDT to EUR (Assuming 1 USDT ~ 1 USD for FX conversion purposes)
-              asset.currentPrice = priceUsdt / eurUsdRate;
-              console.log(`[API] Binance ${ticker}USDT: ${priceUsdt} USDT -> ${asset.currentPrice} EUR`);
+        let priceFound = false;
+
+        // --- SOURCE A: BINANCE (Multiple Mirrors) ---
+        const binanceMirrors = [
+          "https://api.binance.com",
+          "https://api1.binance.com",
+          "https://api3.binance.com"
+        ];
+
+        for (const mirror of binanceMirrors) {
+          if (priceFound) break;
+          try {
+            const res = await fetch(`${mirror}/api/v3/ticker/price?symbol=${ticker}USDT`, {
+              signal: AbortSignal.timeout(3000), // Don't hang the function
+              headers: { "User-Agent": "Mozilla/5.0 RocketPortfolioScanner/1.0" }
+            });
+
+            if (res.ok) {
+              const data = await res.json();
+              const priceUsdt = parseFloat(data.price);
+              if (priceUsdt > 0) {
+                asset.currentPrice = priceUsdt / eurUsdRate;
+                console.log(`[API] SUCCESS: Binance (${mirror}) ${ticker}: ${priceUsdt} USDT -> ${asset.currentPrice} EUR`);
+                priceFound = true;
+              }
+            } else {
+              console.log(`[API] Binance Mirror Failed (${mirror}): HTTP ${res.status}`);
             }
-          } else {
-            console.warn(`[API] Binance fetch failed for ${ticker} (Ticker might not be on Binance)`);
+          } catch (err) {
+             console.warn(`[API] Binance Mirror Exception (${mirror}):`, err instanceof Error ? err.message : "Network error");
           }
-        } catch (err) {
-          console.error(`[API] Binance exception for ${ticker}:`, err);
-          // Skip individual failed assets as requested
+        }
+
+        // --- SOURCE B: YAHOO FINANCE FALLBACK ---
+        if (!priceFound) {
+          try {
+            // Map common crypto tickers to Yahoo Finance format
+            let yahooTicker = `${ticker}-USD`;
+            if (ticker === "TON") yahooTicker = "TON11419-USD"; // Accurate Yahoo ID for TON
+            if (ticker === "ONDO") yahooTicker = "ONDO-USD";
+
+            console.log(`[API] FALLBACK: Trying Yahoo for ${ticker} (${yahooTicker})`);
+            const quote = await yahooInstance.quote(yahooTicker);
+            if (quote && quote.regularMarketPrice) {
+              asset.currentPrice = quote.regularMarketPrice / eurUsdRate;
+              console.log(`[API] SUCCESS: Yahoo Fallback ${ticker}: ${quote.regularMarketPrice} USD -> ${asset.currentPrice} EUR`);
+              priceFound = true;
+            }
+          } catch (err) {
+            console.error(`[API] Yahoo Fallback Failed for ${ticker}:`, err instanceof Error ? err.message : "Unknown error");
+          }
+        }
+
+        if (!priceFound) {
+          console.error(`[API] FATAL: Could not fetch price for ${ticker} from any source.`);
         }
       }
     }
