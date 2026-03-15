@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import YahooFinance from "yahoo-finance2";
 
@@ -85,7 +86,7 @@ export async function POST(req: NextRequest) {
       );
       const uniqueTickers = [...new Set(tickers)].join(",");
       
-      let cmcData: any = null;
+      let cmcData: Record<string, any> | null = null;
       if (cmcApiKey && uniqueTickers) {
         try {
           // Note: CMC supports symbol batching

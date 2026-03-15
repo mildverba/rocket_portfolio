@@ -5,14 +5,13 @@ import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, TrendingUp, TrendingDown, Wallet, PieChart as PieIcon, Layers, Briefcase, Bitcoin, ArrowRight } from "lucide-react";
+import { RefreshCw, TrendingUp, TrendingDown, PieChart as PieIcon, Layers, Briefcase, Bitcoin } from "lucide-react";
 import { Asset } from "@/lib/types";
 import {
   PieChart as RePieChart,
   Pie,
   Cell,
   ResponsiveContainer,
-  Tooltip as ReTooltip,
   Legend as ReLegend
 } from "recharts";
 
