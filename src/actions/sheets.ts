@@ -20,9 +20,14 @@ export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: s
       return { assets: [], error: "Missing Google Sheets configuration in environment variables." };
     }
 
+    const maskedId = `${sheetId.substring(0, 5)}...${sheetId.substring(sheetId.length - 4)}`;
+    console.log(`[SHEETS] Fetching from ID: ${maskedId} at ${new Date().toISOString()}`);
+
     const response = await sheets.spreadsheets.values.get({
       spreadsheetId: sheetId,
       range: "Sheet1!A1:Z", 
+      // Add a dummy parameter to help bust some internal caches if applicable
+      fields: "values",
     });
 
     const allRows = response.data.values;
