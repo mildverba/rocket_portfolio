@@ -3,7 +3,7 @@
 import { google } from "googleapis";
 import { Asset } from "@/lib/types";
 
-export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: string }> {
+export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: string, fetchTime?: string }> {
   try {
     const auth = new google.auth.GoogleAuth({
       credentials: {
@@ -33,13 +33,15 @@ export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: s
     const headers = allRows[0].map(h => (h || "").toString().toLowerCase().trim());
     const rows = allRows.slice(1);
 
-    const tickerIdx = headers.indexOf("ticker");
-    const nameIdx = headers.indexOf("name");
-    const categoryIdx = headers.indexOf("category") !== -1 ? headers.indexOf("category") : headers.indexOf("group");
-    const sharesIdx = headers.indexOf("amount") !== -1 ? headers.indexOf("amount") : headers.indexOf("shares");
-    const buyPriceIdx = headers.indexOf("buy price") !== -1 ? headers.indexOf("buy price") : headers.indexOf("avg price");
-    const currentPriceIdx = headers.indexOf("current price");
-    const brokerIdx = headers.indexOf("broker");
+    const tickerIdx = headers.findIndex(h => h === "ticker" || h === "symbol" || h === "asset");
+    const nameIdx = headers.findIndex(h => h === "name" || h === "company");
+    const categoryIdx = headers.findIndex(h => h === "category" || h === "group" || h === "type");
+    const sharesIdx = headers.findIndex(h => h === "amount" || h === "shares" || h === "quantity" || h === "total");
+    const buyPriceIdx = headers.findIndex(h => h === "buy price" || h === "avg price" || h === "purchase price" || h === "cost");
+    const currentPriceIdx = headers.findIndex(h => h === "current price" || h === "price" || h === "market price");
+    const brokerIdx = headers.findIndex(h => h === "broker" || h === "platform" || h === "account");
+
+    const fetchTime = new Date().toLocaleTimeString();
 
     const aggregatedMap = new Map<string, {
       ticker: string;
@@ -124,11 +126,11 @@ export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: s
       }));
     }
 
-    return { assets };
+    return { assets, fetchTime };
 
   } catch (error: unknown) {
     const err = error as Error;
     console.error("Error fetching Google Sheets data:", err);
-    return { assets: [], error: "Failed to fetch portfolio data: " + err.message };
+    return { assets: [], error: "Failed to fetch portfolio data: " + err.message, fetchTime: new Date().toLocaleTimeString() };
   }
 }

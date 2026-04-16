@@ -20,10 +20,19 @@ const CRYPTO_COLORS = ["#A855F7", "#fbbf24", "#94a3b8"];
 
 import { fetchPortfolioData } from "@/actions/sheets";
 
-export function PortfolioDashboard({ assets: initialAssets = [], error: initialError }: { assets?: Asset[], error?: string }) {
+export function PortfolioDashboard({ 
+  assets: initialAssets = [], 
+  error: initialError, 
+  fetchTime: initialFetchTime 
+}: { 
+  assets?: Asset[], 
+  error?: string, 
+  fetchTime?: string 
+}) {
   const [assets, setAssets] = useState<Asset[]>(initialAssets);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | undefined>(initialError);
+  const [fetchTime, setFetchTime] = useState<string | undefined>(initialFetchTime);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -34,6 +43,7 @@ export function PortfolioDashboard({ assets: initialAssets = [], error: initialE
       if (sheetRes.error) throw new Error(sheetRes.error);
       
       const freshAssets = sheetRes.assets;
+      if (sheetRes.fetchTime) setFetchTime(sheetRes.fetchTime);
 
       // 2. Then fetch live prices for these fresh assets
       const response = await fetch("/api/prices", {
@@ -302,10 +312,17 @@ return (
               </TabsList>
             </div>
             <div className="flex items-center gap-3">
-               <div className="flex items-center gap-2 text-[10px] md:text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.2em] leading-none">
-                  <span className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-green-500 animate-pulse" />
-                  Live Sync
-               </div>
+                <div className="flex flex-col items-end gap-1">
+                  <div className="flex items-center gap-2 text-[10px] md:text-[11px] font-extrabold text-slate-400 uppercase tracking-[0.2em] leading-none">
+                    <span className="w-1.5 md:w-2 h-1.5 md:h-2 rounded-full bg-green-500 animate-pulse" />
+                    Live Sync
+                  </div>
+                  {fetchTime && (
+                    <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">
+                      Sheet: {fetchTime}
+                    </span>
+                  )}
+                </div>
             </div>
           </CardHeader>
 
