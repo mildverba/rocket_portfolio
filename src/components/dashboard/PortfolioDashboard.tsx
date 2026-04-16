@@ -18,6 +18,8 @@ import {
 const COLORS = ["#A855F7", "#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#f43f5e", "#8b5cf6", "#3b82f6"];
 const CRYPTO_COLORS = ["#A855F7", "#fbbf24", "#94a3b8"];
 
+import { fetchPortfolioData } from "@/actions/sheets";
+
 export function PortfolioDashboard({ assets: initialAssets = [], error: initialError }: { assets?: Asset[], error?: string }) {
   const [assets, setAssets] = useState<Asset[]>(initialAssets);
   const [isRefreshing, setIsRefreshing] = useState(false);
@@ -27,10 +29,17 @@ export function PortfolioDashboard({ assets: initialAssets = [], error: initialE
     setIsRefreshing(true);
     setError(undefined);
     try {
+      // 1. Fetch fresh data from Google Sheets first
+      const sheetRes = await fetchPortfolioData();
+      if (sheetRes.error) throw new Error(sheetRes.error);
+      
+      const freshAssets = sheetRes.assets;
+
+      // 2. Then fetch live prices for these fresh assets
       const response = await fetch("/api/prices", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ assets }),
+        body: JSON.stringify({ assets: freshAssets }),
       });
 
       if (!response.ok) {
@@ -41,6 +50,8 @@ export function PortfolioDashboard({ assets: initialAssets = [], error: initialE
       const { updatedAssets } = await response.json();
       if (updatedAssets) {
         setAssets([...updatedAssets]);
+      } else {
+        setAssets([...freshAssets]);
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to fetch live prices.");

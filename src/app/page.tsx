@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import { PortfolioDashboard } from "@/components/dashboard/PortfolioDashboard";
 import { fetchPortfolioData } from "@/actions/sheets";
 
