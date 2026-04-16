@@ -331,7 +331,7 @@ return (
               <table className="w-full text-left border-collapse min-w-[1200px]">
                 <thead>
                   <tr className="bg-slate-50/50">
-                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest pl-10">Ticker</th>
+                    <th className="sticky left-0 z-30 bg-slate-50/95 backdrop-blur-sm px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest pl-10 border-r border-slate-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Ticker</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Qty</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Avg Price</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Market Value</th>
@@ -351,7 +351,7 @@ return (
 
                     return (
                       <tr key={asset.ticker} className="hover:bg-slate-50/40 transition-colors group">
-                        <td className="px-4 py-6 pl-10 border-l-2 border-transparent hover:border-purple-600">
+                        <td className="sticky left-0 z-20 bg-white px-4 py-6 pl-10 border-l-2 border-transparent hover:border-purple-600 border-r border-slate-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                           <div className="flex flex-col">
                             <span className="font-extrabold text-[#111827] text-base group-hover:text-purple-600 transition-colors tracking-tight">{asset.ticker}</span>
                             <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase">{asset.group}</span>
@@ -397,7 +397,7 @@ return (
               <table className="w-full text-left border-collapse min-w-[1100px]">
                 <thead>
                   <tr className="bg-slate-50/50">
-                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest pl-10">Ticker</th>
+                    <th className="sticky left-0 z-30 bg-slate-50/95 backdrop-blur-sm px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest pl-10 border-r border-slate-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Ticker</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Quantity</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Purchase Price</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Current Price</th>
@@ -413,7 +413,7 @@ return (
 
                     return (
                       <tr key={asset.ticker} className="hover:bg-slate-50/40 transition-colors group">
-                        <td className="px-4 py-7 pl-10">
+                        <td className="sticky left-0 z-20 bg-white px-4 py-7 pl-10 border-r border-slate-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
                           <div className="flex items-center gap-4">
                             <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center shadow-sm">
                               <Bitcoin size={20} className="text-purple-600" />
