@@ -413,15 +413,10 @@ return (
 
                     return (
                       <tr key={asset.ticker} className="hover:bg-slate-50/40 transition-colors group">
-                        <td className="sticky left-0 z-20 bg-white px-4 py-7 pl-10 border-r border-slate-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">
-                          <div className="flex items-center gap-4">
-                            <div className="w-10 h-10 rounded-xl bg-purple-50 flex items-center justify-center shadow-sm">
-                              <Bitcoin size={20} className="text-purple-600" />
-                            </div>
-                            <div className="flex flex-col">
-                              <span className="font-extrabold text-[#111827] text-base group-hover:text-purple-600 transition-colors tracking-tight">{asset.ticker}</span>
-                              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Binance Live</span>
-                            </div>
+                        <td className="sticky left-0 z-20 bg-white px-4 py-7 pl-10 border-r border-slate-100 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)] border-l-2 border-transparent hover:border-purple-600">
+                          <div className="flex flex-col">
+                            <span className="font-extrabold text-[#111827] text-base group-hover:text-purple-600 transition-colors tracking-tight">{asset.ticker}</span>
+                            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{asset.name || "Crypto Asset"}</span>
                           </div>
                         </td>
                         <td className="px-4 py-7 text-right">
