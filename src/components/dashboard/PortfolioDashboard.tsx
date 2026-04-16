@@ -70,8 +70,13 @@ export function PortfolioDashboard({
     }
   };
 
-  const stocks = assets.filter(a => a.group !== "Crypto");
-  const crypto = assets.filter(a => a.group === "Crypto");
+  const stocks = assets
+    .filter(a => a.group !== "Crypto")
+    .sort((a, b) => (b.shares * b.currentPrice) - (a.shares * a.currentPrice));
+
+  const crypto = assets
+    .filter(a => a.group === "Crypto")
+    .sort((a, b) => (b.shares * b.currentPrice) - (a.shares * a.currentPrice));
 
   const stocksTotal = stocks.reduce((acc, curr) => acc + (curr.shares * curr.currentPrice), 0);
   const cryptoTotal = crypto.reduce((acc, curr) => acc + (curr.shares * curr.currentPrice), 0);
