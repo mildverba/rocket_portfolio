@@ -45,6 +45,7 @@ export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: s
     const buyPriceIdx = headers.findIndex(h => h === "buy price" || h === "avg price" || h === "purchase price" || h === "cost");
     const currentPriceIdx = headers.findIndex(h => h === "current price" || h === "price" || h === "market price");
     const brokerIdx = headers.findIndex(h => h === "broker" || h === "platform" || h === "account");
+    const sectorIdx = headers.findIndex(h => h === "sector" || h === "industry");
 
     const fetchTime = new Date().toLocaleTimeString();
 
@@ -57,6 +58,7 @@ export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: s
       currentPrice: number;
       brokers: Set<string>;
       breakdown: Record<string, number>;
+      sector: string;
     }>();
 
     rows.forEach((row) => {
@@ -78,6 +80,10 @@ export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: s
       const currentPrice = parseFloat(rawCurrentPrice.replace(/[€$,\s]/g, "").replace(",", ".")) || 0;
       
       const broker = (brokerIdx !== -1 && row[brokerIdx]) ? row[brokerIdx].toString().trim() : "Unknown";
+      
+      // Special handling for Sector: if sectorIdx not found in headers, use Column D (index 3)
+      const sIdx = sectorIdx !== -1 ? sectorIdx : 3;
+      const sector = (row[sIdx]) ? row[sIdx].toString().trim() : "Other";
 
       const existing = aggregatedMap.get(ticker);
       if (existing) {
@@ -87,6 +93,9 @@ export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: s
         if (broker) {
           existing.brokers.add(broker);
           existing.breakdown[broker] = (existing.breakdown[broker] || 0) + shares;
+        }
+        if (sector && sector !== "Other") {
+          existing.sector = sector;
         }
       } else {
         const brokersSet = new Set<string>();
@@ -103,7 +112,8 @@ export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: s
           totalCost: (shares * avgPrice),
           currentPrice,
           brokers: brokersSet,
-          breakdown: initialBreakdown
+          breakdown: initialBreakdown,
+          sector: sector || "Other"
         });
       }
     });
@@ -118,6 +128,7 @@ export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: s
       currentPrice: data.currentPrice,
       broker: Array.from(data.brokers).join(", "),
       breakdown: Object.entries(data.breakdown).map(([b, s]) => ({ broker: b, shares: s })),
+      sector: data.sector,
       portfolioPercent: 0,
     }));
 

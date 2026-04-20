@@ -12,6 +12,7 @@ export type Asset = {
   currentPriceUsd?: number;
   priceSource?: 'api' | 'sheet' | 'none';
   broker?: string;
+  sector?: string;
   breakdown?: { broker: string; shares: number }[];
   portfolioPercent: number; // Will be calculated after fetching all
 };
