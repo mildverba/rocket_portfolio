@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, TrendingUp, TrendingDown, PieChart as PieIcon, Layers, Briefcase, Bitcoin } from "lucide-react";
+import { RefreshCw, TrendingUp, TrendingDown, PieChart as PieIcon, Layers, Briefcase } from "lucide-react";
 import { Asset } from "@/lib/types";
 import { SectorAnalytics } from "./SectorAnalytics";
 import {
@@ -109,8 +109,6 @@ export function PortfolioDashboard({
     value,
     percent: stocksTotal > 0 ? (value / stocksTotal) * 100 : 0
   }));
-
-  const hasSectorData = assets.some(a => a.sector && a.sector !== "Other");
 
   // Crypto Stats
   let btcVal = 0, ethVal = 0, othersVal = 0;

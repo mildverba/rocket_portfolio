@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { PieChart as RePieChart, Pie, Cell, ResponsiveContainer, Legend as ReLegend } from "recharts";
@@ -82,11 +83,11 @@ export function SectorAnalytics({ stocks }: SectorAnalyticsProps) {
                   layout="vertical" 
                   align="right" 
                   verticalAlign="middle"
-                  content={(props: any) => {
+                  content={(props) => {
                     const { payload } = props;
                     return (
                       <ul className="text-xs font-bold text-slate-500 space-y-3 ml-4">
-                        {payload.map((entry: any, index: number) => (
+                        {payload?.map((entry: any, index: number) => (
                           <li key={`index-${index}`} className="flex items-center gap-2">
                             <div className="w-3 h-3 rounded-full" style={{ backgroundColor: entry.color }} />
                             <span className="text-[#111827]">{entry.value}</span>
