@@ -32,6 +32,7 @@ export function PortfolioDashboard({
   fetchTime?: string 
 }) {
   const [assets, setAssets] = useState<Asset[]>(initialAssets);
+  const [activeTab, setActiveTab] = useState("stocks");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | undefined>(initialError);
   const [fetchTime, setFetchTime] = useState<string | undefined>(initialFetchTime);
@@ -179,9 +180,12 @@ return (
       </div>
     </div>
 
-    <div className="p-4 md:p-8 space-y-6 md:space-y-10 flex flex-col">
-      {/* UPPER SECTION (Responsive grid) */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:min-h-[300px]">
+      <div className="p-4 md:p-8 space-y-6 md:space-y-10 flex flex-col">
+      
+      {activeTab !== "analytics" && (
+        <>
+        {/* UPPER SECTION (Responsive grid) */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:min-h-[300px]">
         
         {/* Summary Card */}
         <Card className={cardClassName}>
@@ -310,10 +314,12 @@ return (
         </Card>
 
       </div>
+      </>
+      )}
 
       {/* LOWER SECTION (Inventory Table Refinements) */}
       <div className="bg-white shadow-2xl border border-slate-100 rounded-2xl flex flex-col overflow-visible">
-        <Tabs defaultValue="stocks" className="flex flex-col">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="flex flex-col">
           <CardHeader className="px-5 md:px-8 py-6 md:py-8 border-b border-slate-50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 md:gap-10">
               <CardTitle className="text-xl md:text-2xl font-extrabold text-[#111827] tracking-tighter">Portfolio <span className="text-purple-600">Inventory</span></CardTitle>
