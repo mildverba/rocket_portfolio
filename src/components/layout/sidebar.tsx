@@ -2,10 +2,18 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, PieChart, Wallet } from "lucide-react";
+import { LayoutDashboard, LogOut, PieChart, Wallet } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await fetch("/api/auth/logout", { method: "POST" });
+    router.push("/login");
+    router.refresh();
+  };
 
   return (
     <aside className="w-64 border-r bg-muted/40 h-screen flex flex-col hidden md:flex">
@@ -39,8 +47,15 @@ export function Sidebar() {
           Analytics
         </Link>
       </nav>
-      <div className="p-6 border-t mt-auto">
+      <div className="p-6 border-t mt-auto space-y-4">
         <div className="text-sm text-muted-foreground">Currency: EUR</div>
+        <button 
+          onClick={handleLogout}
+          className="flex items-center gap-3 px-3 py-2 w-full text-left text-sm font-bold text-rose-600 hover:bg-rose-50 rounded-md transition-all group"
+        >
+          <LogOut className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
+          Log Out
+        </button>
       </div>
     </aside>
   );
