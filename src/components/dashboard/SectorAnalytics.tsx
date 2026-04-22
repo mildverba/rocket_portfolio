@@ -12,13 +12,21 @@ interface SectorAnalyticsProps {
 }
 
 export function SectorAnalytics({ stocks }: SectorAnalyticsProps) {
-  const stocksTotal = stocks.reduce((acc, curr) => acc + (curr.shares * curr.currentPrice), 0);
+  // Use currentPrice if available, otherwise fallback to avgPrice (Investment cost) 
+  // to ensure distribution charts always show something meaningful.
+  const getValue = (asset: Asset) => {
+    const price = asset.currentPrice > 0 ? asset.currentPrice : asset.avgPrice;
+    return (asset.shares || 0) * (price || 0);
+  };
+
+  const stocksTotal = stocks.reduce((acc, curr) => acc + getValue(curr), 0);
+  const isUsingCostBasis = stocks.length > 0 && stocks.every(s => (s.currentPrice || 0) === 0);
 
   // 1. Sector Stats calculation
   const sectorStats: Record<string, number> = {};
   stocks.forEach(asset => {
     const s = asset.sector?.trim() || "Other";
-    const value = (asset.shares || 0) * (asset.currentPrice || 0);
+    const value = getValue(asset);
     if (!isNaN(value) && value > 0) {
       sectorStats[s] = (sectorStats[s] || 0) + value;
     }
@@ -34,11 +42,14 @@ export function SectorAnalytics({ stocks }: SectorAnalyticsProps) {
 
   // 2. Individual Stock Stats calculation
   const stockData = stocks
-    .map(asset => ({
-      ticker: asset.ticker,
-      value: asset.shares * asset.currentPrice,
-      percent: stocksTotal > 0 ? ((asset.shares * asset.currentPrice) / stocksTotal) * 100 : 0
-    }))
+    .map(asset => {
+      const val = getValue(asset);
+      return {
+        ticker: asset.ticker,
+        value: val,
+        percent: stocksTotal > 0 ? (val / stocksTotal) * 100 : 0
+      };
+    })
     .sort((a, b) => b.value - a.value);
 
   const hasSectorData = sectorData.length > 0;
@@ -63,9 +74,17 @@ export function SectorAnalytics({ stocks }: SectorAnalyticsProps) {
       <div className="p-6 bg-purple-50 rounded-2xl border border-purple-100 flex flex-col md:flex-row items-center justify-between gap-4">
          <div>
             <h2 className="text-xl md:text-2xl font-black text-purple-900 tracking-tighter">Portfolio Concentration</h2>
-            <p className="text-sm text-purple-600 font-extrabold uppercase tracking-widest opacity-80 mt-1">
-              Analyzing {stocks.length} assets across {sectorData.length} sectors
-            </p>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
+              <p className="text-sm text-purple-600 font-extrabold uppercase tracking-widest opacity-80">
+                Analyzing {stocks.length} assets across {sectorData.length} sectors
+              </p>
+              {isUsingCostBasis && (
+                <div className="flex items-center gap-2 text-[10px] bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200 font-black uppercase overflow-hidden animate-in fade-in slide-in-from-left-2 transition-all">
+                  <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
+                  Showing Cost Basis (Refresh for Market Prices)
+                </div>
+              )}
+            </div>
          </div>
       </div>
 
