@@ -334,24 +334,6 @@ return (
                 </TabsTrigger>
               </TabsList>
 
-              {activeTab !== 'analytics' && (
-                <Button 
-                  variant="outline" 
-                  size="sm" 
-                  onClick={() => {
-                    if (activeTab === 'stocks') {
-                      exportAssetsToExcel(stocks, "Stocks_Portfolio", "stocks");
-                    } else if (activeTab === 'crypto') {
-                      exportAssetsToExcel(crypto, "Crypto_Portfolio", "crypto");
-                    }
-                  }}
-                  className="h-9 px-4 border-slate-200 hover:bg-slate-50 hover:text-purple-600 text-[11px] font-black uppercase tracking-wider transition-all gap-2 shadow-sm active:scale-95"
-                >
-                  <FileSpreadsheet className="w-4 h-4" />
-                  <span className="hidden sm:inline">Export to Excel</span>
-                  <span className="sm:hidden">Export</span>
-                </Button>
-              )}
             </div>
             <div className="flex items-center gap-3">
                 <div className="flex flex-col items-end gap-1">
@@ -369,6 +351,18 @@ return (
           </CardHeader>
 
           <TabsContent value="stocks" className="m-0 p-0 overflow-visible">
+            <div className="px-5 md:px-8 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Stock Assets Breakdown</div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => exportAssetsToExcel(stocks, "Stocks_Portfolio", "stocks")}
+                className="h-8 px-3 text-purple-600 hover:bg-purple-50 text-[10px] font-black uppercase tracking-wider gap-2 transition-all"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                Export Stocks to Excel
+              </Button>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[1200px]">
                 <thead>
@@ -435,6 +429,18 @@ return (
           </TabsContent>
 
           <TabsContent value="crypto" className="m-0 p-0 overflow-visible">
+            <div className="px-5 md:px-8 py-4 border-b border-slate-50 flex items-center justify-between bg-slate-50/30">
+              <div className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">Crypto Assets Breakdown</div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={() => exportAssetsToExcel(crypto, "Crypto_Portfolio", "crypto")}
+                className="h-8 px-3 text-purple-600 hover:bg-purple-50 text-[10px] font-black uppercase tracking-wider gap-2 transition-all"
+              >
+                <FileSpreadsheet className="w-3.5 h-3.5" />
+                Export Crypto to Excel
+              </Button>
+            </div>
             <div className="overflow-x-auto">
               <table className="w-full text-left border-collapse min-w-[1100px]">
                 <thead>
