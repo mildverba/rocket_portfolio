@@ -29,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     return NextResponse.json({ error: "Invalid username or password" }, { status: 401 });
-  } catch (error) {
+  } catch {
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });
   }
 }
