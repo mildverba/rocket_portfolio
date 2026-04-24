@@ -6,9 +6,10 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, TrendingUp, TrendingDown, PieChart as PieIcon, Layers, Briefcase } from "lucide-react";
+import { RefreshCw, TrendingUp, TrendingDown, PieChart as PieIcon, Layers, Briefcase, FileSpreadsheet } from "lucide-react";
 import { Asset } from "@/lib/types";
 import { SectorAnalytics } from "./SectorAnalytics";
+import { exportAssetsToExcel } from "@/lib/exportUtils";
 import {
   PieChart as RePieChart,
   Pie,
@@ -345,6 +346,25 @@ return (
                     </span>
                   )}
                 </div>
+
+                {activeTab !== 'analytics' && (
+                  <Button 
+                    variant="outline" 
+                    size="sm" 
+                    onClick={() => {
+                      if (activeTab === 'stocks') {
+                        exportAssetsToExcel(stocks, "Stocks_Portfolio", "stocks");
+                      } else if (activeTab === 'crypto') {
+                        exportAssetsToExcel(crypto, "Crypto_Portfolio", "crypto");
+                      }
+                    }}
+                    className="h-9 px-4 border-slate-200 hover:bg-slate-50 hover:text-purple-600 text-[11px] font-black uppercase tracking-wider transition-all gap-2 shadow-sm active:scale-95"
+                  >
+                    <FileSpreadsheet className="w-4 h-4" />
+                    <span className="hidden sm:inline">Export to Excel</span>
+                    <span className="sm:hidden">Export</span>
+                  </Button>
+                )}
             </div>
           </CardHeader>
 
