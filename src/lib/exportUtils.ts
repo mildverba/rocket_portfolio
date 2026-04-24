@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { utils, writeFile } from 'xlsx';
 import { Asset } from './types';
 

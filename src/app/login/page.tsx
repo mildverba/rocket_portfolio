@@ -30,7 +30,7 @@ export default function LoginPage() {
         const data = await res.json();
         setError(data.error || "Invalid credentials. Please try again.");
       }
-    } catch (err) {
+    } catch {
       setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
