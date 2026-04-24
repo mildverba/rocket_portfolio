@@ -1,4 +1,4 @@
-import * as XLSX from 'xlsx';
+import { utils, writeFile } from 'xlsx';
 import { Asset } from './types';
 
 export const exportAssetsToExcel = (assets: Asset[], filename: string, type: 'stocks' | 'crypto') => {
@@ -43,10 +43,10 @@ export const exportAssetsToExcel = (assets: Asset[], filename: string, type: 'st
     });
   }
 
-  const worksheet = XLSX.utils.json_to_sheet(data);
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Portfolio");
+  const worksheet = utils.json_to_sheet(data);
+  const workbook = utils.book_new();
+  utils.book_append_sheet(workbook, worksheet, "Portfolio");
 
   // Generate and download the file
-  XLSX.writeFile(workbook, `${filename}.xlsx`);
+  writeFile(workbook, `${filename}.xlsx`);
 };

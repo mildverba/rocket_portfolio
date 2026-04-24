@@ -333,6 +333,25 @@ return (
                   Analytics
                 </TabsTrigger>
               </TabsList>
+
+              {activeTab !== 'analytics' && (
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  onClick={() => {
+                    if (activeTab === 'stocks') {
+                      exportAssetsToExcel(stocks, "Stocks_Portfolio", "stocks");
+                    } else if (activeTab === 'crypto') {
+                      exportAssetsToExcel(crypto, "Crypto_Portfolio", "crypto");
+                    }
+                  }}
+                  className="h-9 px-4 border-slate-200 hover:bg-slate-50 hover:text-purple-600 text-[11px] font-black uppercase tracking-wider transition-all gap-2 shadow-sm active:scale-95"
+                >
+                  <FileSpreadsheet className="w-4 h-4" />
+                  <span className="hidden sm:inline">Export to Excel</span>
+                  <span className="sm:hidden">Export</span>
+                </Button>
+              )}
             </div>
             <div className="flex items-center gap-3">
                 <div className="flex flex-col items-end gap-1">
@@ -346,25 +365,6 @@ return (
                     </span>
                   )}
                 </div>
-
-                {activeTab !== 'analytics' && (
-                  <Button 
-                    variant="outline" 
-                    size="sm" 
-                    onClick={() => {
-                      if (activeTab === 'stocks') {
-                        exportAssetsToExcel(stocks, "Stocks_Portfolio", "stocks");
-                      } else if (activeTab === 'crypto') {
-                        exportAssetsToExcel(crypto, "Crypto_Portfolio", "crypto");
-                      }
-                    }}
-                    className="h-9 px-4 border-slate-200 hover:bg-slate-50 hover:text-purple-600 text-[11px] font-black uppercase tracking-wider transition-all gap-2 shadow-sm active:scale-95"
-                  >
-                    <FileSpreadsheet className="w-4 h-4" />
-                    <span className="hidden sm:inline">Export to Excel</span>
-                    <span className="sm:hidden">Export</span>
-                  </Button>
-                )}
             </div>
           </CardHeader>
 
