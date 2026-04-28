@@ -10,6 +10,7 @@ import { RefreshCw, TrendingUp, TrendingDown, PieChart as PieIcon, Layers, Brief
 import { Asset } from "@/lib/types";
 import { SectorAnalytics } from "./SectorAnalytics";
 import { exportAssetsToExcel } from "@/lib/exportUtils";
+import { TradingViewChart } from "./TradingViewChart";
 import {
   PieChart as RePieChart,
   Pie,
@@ -502,8 +503,33 @@ return (
             </div>
           </TabsContent>
 
-          <TabsContent value="analytics" className="m-0 p-6 md:p-8 bg-white min-h-[400px]">
-             <SectorAnalytics stocks={stocks} />
+          <TabsContent value="analytics" className="m-0 p-0 overflow-visible bg-slate-50/10 rounded-b-2xl">
+            <div className="p-4 md:p-6 lg:p-8">
+              <Tabs defaultValue="sector" className="flex flex-col gap-4 md:gap-6">
+                <TabsList className="bg-slate-100/80 p-1 h-9 md:h-11 rounded-xl w-fit">
+                  <TabsTrigger value="sector" className="text-[10px] md:text-sm font-extrabold px-3 md:px-6 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm rounded-lg transition-all tracking-tight">
+                    Sector Overview
+                  </TabsTrigger>
+                  <TabsTrigger value="charts" className="text-[10px] md:text-sm font-extrabold px-3 md:px-6 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm rounded-lg transition-all tracking-tight">
+                    Charts
+                  </TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="sector" className="m-0 bg-white min-h-[400px] rounded-3xl p-6 lg:p-8 shadow-sm border border-slate-100">
+                  <SectorAnalytics stocks={stocks} />
+                </TabsContent>
+                
+                <TabsContent value="charts" className="m-0 bg-white min-h-[400px] rounded-3xl p-6 lg:p-8 shadow-sm border border-slate-100 flex flex-col space-y-6">
+                  <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
+                    <div>
+                      <h2 className="text-xl md:text-2xl font-black text-[#111827] tracking-tighter">Market <span className="text-purple-600">Charts</span></h2>
+                      <p className="text-sm text-slate-500 font-bold tracking-tight">Real-time charting and technical analysis</p>
+                    </div>
+                  </div>
+                  <TradingViewChart symbol="WRESBAL" />
+                </TabsContent>
+              </Tabs>
+            </div>
           </TabsContent>
         </Tabs>
       </div>
