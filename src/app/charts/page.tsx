@@ -28,6 +28,21 @@ export default function ChartsPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10">
           <TradingViewChart symbol="WRESBAL" />
         </div>
+
+        <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6">
+          <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
+            Баланс TGA <span className="font-bold text-amber-700">(деньги возвращаются в банки)</span>
+          </h3>
+          <p className="mt-3 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+          <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+            <li>Падает (правительство тратит)</li>
+            <li>Особенно резко (–100–300 млрд за месяц)</li>
+          </ol>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10">
+          <TradingViewChart symbol="FRED:WTREGEN" />
+        </div>
       </div>
     </div>
   );

@@ -526,7 +526,28 @@ return (
                       <p className="text-sm text-slate-500 font-bold tracking-tight">Real-time charting and technical analysis</p>
                     </div>
                   </div>
+                  <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6">
+                    <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
+                      WRESBAL <span className="font-bold text-amber-700">(bank reserves)</span>. Key signals:
+                    </h3>
+                    <ol className="mt-3 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+                      <li>Sustained above ~$3.1–3.2 trillion</li>
+                      <li>Growing for 2–4 consecutive weeks</li>
+                    </ol>
+                  </div>
                   <TradingViewChart symbol="WRESBAL" />
+
+                  <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6 mt-8">
+                    <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
+                      Баланс TGA <span className="font-bold text-amber-700">(деньги возвращаются в банки)</span>
+                    </h3>
+                    <p className="mt-3 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+                    <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+                      <li>Падает (правительство тратит)</li>
+                      <li>Особенно резко (–100–300 млрд за месяц)</li>
+                    </ol>
+                  </div>
+                  <TradingViewChart symbol="FRED:WTREGEN" />
                 </TabsContent>
               </Tabs>
             </div>
