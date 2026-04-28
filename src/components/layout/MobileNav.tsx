@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { LayoutDashboard, PieChart, Wallet, LogOut } from "lucide-react";
+import { LayoutDashboard, PieChart, Wallet, LogOut, LineChart } from "lucide-react";
 
 export function MobileNav() {
   const router = useRouter();
@@ -27,6 +27,9 @@ export function MobileNav() {
         </Link>
         <Link href="/sector-analysis">
           <PieChart className="w-5 h-5 text-slate-500 hover:text-purple-600 transition-colors" />
+        </Link>
+        <Link href="/charts">
+          <LineChart className="w-5 h-5 text-slate-500 hover:text-purple-600 transition-colors" />
         </Link>
         <button onClick={handleLogout} className="text-rose-500 hover:text-rose-700 transition-all active:scale-90">
           <LogOut className="w-5 h-5" />

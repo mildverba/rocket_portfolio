@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { LayoutDashboard, LogOut, PieChart, Wallet } from "lucide-react";
+import { LayoutDashboard, LogOut, PieChart, Wallet, LineChart } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export function Sidebar() {
@@ -45,6 +45,17 @@ export function Sidebar() {
         >
           <PieChart className="w-4 h-4" />
           Analytics
+        </Link>
+        <Link 
+          href="/charts" 
+          className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors pl-7 ${
+            pathname === "/charts" 
+              ? "text-primary font-medium bg-primary/10" 
+              : "text-muted-foreground hover:text-primary hover:bg-muted"
+          }`}
+        >
+          <LineChart className="w-4 h-4" />
+          Charts
         </Link>
       </nav>
       <div className="p-6 border-t mt-auto space-y-4">
