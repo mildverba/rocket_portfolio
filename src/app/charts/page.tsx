@@ -43,6 +43,20 @@ export default function ChartsPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10">
           <TradingViewChart symbol="FRED:WTREGEN" />
         </div>
+
+        <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6">
+          <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
+            Reverse Repo <span className="font-bold text-amber-700">(нет “черной дыры”, которая высасывает ликвидность)</span>
+          </h3>
+          <p className="mt-3 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+          <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+            <li>Падение (или уже у нуля)</li>
+          </ol>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10">
+          <TradingViewChart symbol="FRED:RRPONTSYD" />
+        </div>
       </div>
     </div>
   );

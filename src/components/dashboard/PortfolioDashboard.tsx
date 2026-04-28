@@ -548,6 +548,17 @@ return (
                     </ol>
                   </div>
                   <TradingViewChart symbol="FRED:WTREGEN" />
+
+                  <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6 mt-8">
+                    <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
+                      Reverse Repo <span className="font-bold text-amber-700">(нет “черной дыры”, которая высасывает ликвидность)</span>
+                    </h3>
+                    <p className="mt-3 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+                    <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+                      <li>Падение (или уже у нуля)</li>
+                    </ol>
+                  </div>
+                  <TradingViewChart symbol="FRED:RRPONTSYD" />
                 </TabsContent>
               </Tabs>
             </div>
