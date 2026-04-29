@@ -74,6 +74,32 @@ export default function ChartsPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10">
           <TradingViewChart symbol="US10Y" />
         </div>
+
+        <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6">
+          <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
+            US02Y <span className="font-bold text-amber-700">(доходность 2-летних облигаций США)</span>. US02Y ≈ ожидания рынка по ставке ФРС
+          </h3>
+          <p className="mt-3 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+          <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+            <li>Падает -&gt; рынок ждёт снижения ставок, финансовые условия смягчаются</li>
+            <li>Растет -&gt; рынок ждёт ужесточения, ставки могут вырасти</li>
+            <li>Резкие скачки -&gt; неопределённость</li>
+            <li>Мощная связка с US10Y:
+              <ul className="pl-6 mt-1 space-y-1 list-disc">
+                <li>US02Y &gt; US10Y -&gt; Плохо. Рынок ждет рецессию.</li>
+                <li>US02Y падает быстрее US10Y -&gt; ФРС скоро смягчает политику</li>
+              </ul>
+            </li>
+          </ol>
+          <div className="mt-4 space-y-1 text-xs font-bold text-amber-900/80 italic">
+            <p>* US02Y = “что думает рынок о ФРС”</p>
+            <p>* US10Y = “что происходит в экономике”</p>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10">
+          <TradingViewChart symbol="US02Y" />
+        </div>
       </div>
     </div>
   );
