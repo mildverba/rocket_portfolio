@@ -562,15 +562,17 @@ return (
 
                   <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6 mt-8">
                     <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
-                      MOVE <span className="font-bold text-amber-700">(индекс волатильности рынка облигаций США)</span>
+                      US10Y <span className="font-bold text-amber-700">(доходность 10-летних облигаций США)</span>
                     </h3>
                     <p className="mt-3 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
                     <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
-                      <li>Падение ниже ~80 → затем к 70 → к 60</li>
-                      <li>Risk-off больше 100-120. Нейтрально 80-100. Ниже 80 хорошо.</li>
+                      <li>Плавное падение без резких скачков - идеально</li>
+                      <li>Резкое падение -&gt; кризис</li>
+                      <li>Резкий рост (длинные свечи)-&gt; плохо</li>
+                      <li>Плавный рост - норм.</li>
                     </ol>
                   </div>
-                  <TradingViewChart symbol="MOVE" />
+                  <TradingViewChart symbol="US10Y" />
                 </TabsContent>
               </Tabs>
             </div>
