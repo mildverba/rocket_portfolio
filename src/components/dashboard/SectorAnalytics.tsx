@@ -9,22 +9,30 @@ const COLORS = ["#A855F7", "#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#f43f5e"
 
 interface SectorAnalyticsProps {
   stocks: Asset[];
+  crypto?: Asset[];
 }
 
-export function SectorAnalytics({ stocks }: SectorAnalyticsProps) {
-  // Use currentPrice if available, otherwise fallback to avgPrice (Investment cost) 
-  // to ensure distribution charts always show something meaningful.
-  const getValue = (asset: Asset) => {
-    const price = asset.currentPrice > 0 ? asset.currentPrice : asset.avgPrice;
-    return (asset.shares || 0) * (price || 0);
-  };
+const getValue = (asset: Asset) => {
+  const price = asset.currentPrice > 0 ? asset.currentPrice : asset.avgPrice;
+  return (asset.shares || 0) * (price || 0);
+};
 
-  const stocksTotal = stocks.reduce((acc, curr) => acc + getValue(curr), 0);
-  const isUsingCostBasis = stocks.length > 0 && stocks.every(s => (s.currentPrice || 0) === 0);
-
-  // 1. Sector Stats calculation
+function DistributionView({ 
+  assets, 
+  title, 
+  accentColor = "blue",
+  typeLabel = "Asset"
+}: { 
+  assets: Asset[], 
+  title: string, 
+  accentColor?: "blue" | "purple" | "orange",
+  typeLabel?: string
+}) {
+  const total = assets.reduce((acc, curr) => acc + getValue(curr), 0);
+  
+  // Sector Stats calculation
   const sectorStats: Record<string, number> = {};
-  stocks.forEach(asset => {
+  assets.forEach(asset => {
     const s = asset.sector?.trim() || "Other";
     const value = getValue(asset);
     if (!isNaN(value) && value > 0) {
@@ -37,85 +45,60 @@ export function SectorAnalytics({ stocks }: SectorAnalyticsProps) {
     .map(([name, value]) => ({ 
       name, 
       value,
-      percent: stocksTotal > 0 ? (value / stocksTotal) * 100 : 0
+      percent: total > 0 ? (value / total) * 100 : 0
     }));
 
-  // 2. Individual Stock Stats calculation
-  const stockData = stocks
+  // Individual Asset Stats calculation
+  const assetData = assets
     .map(asset => {
       const val = getValue(asset);
       return {
         ticker: asset.ticker,
         value: val,
-        percent: stocksTotal > 0 ? (val / stocksTotal) * 100 : 0
+        percent: total > 0 ? (val / total) * 100 : 0
       };
     })
     .sort((a, b) => b.value - a.value);
 
-  const hasSectorData = sectorData.length > 0;
+  const colorsMap = {
+    blue: { bg: "bg-blue-100", text: "text-blue-600", bar: "bg-blue-500", hover: "group-hover:text-blue-600" },
+    purple: { bg: "bg-purple-100", text: "text-purple-600", bar: "bg-purple-500", hover: "group-hover:text-purple-600" },
+    orange: { bg: "bg-orange-100", text: "text-orange-600", bar: "bg-orange-500", hover: "group-hover:text-orange-600" },
+  };
 
-  if (!hasSectorData && stocks.length === 0) {
-    return (
-      <div className="flex flex-col items-center justify-center py-20 px-6 border-2 border-dashed border-slate-100 rounded-3xl bg-slate-50/30">
-        <div className="bg-white p-4 rounded-full shadow-sm mb-4">
-          <PieIcon size={32} className="text-slate-200" />
-        </div>
-        <h3 className="text-lg font-extrabold text-slate-800 tracking-tight">No Portfolio Data Available</h3>
-        <p className="text-slate-400 text-sm font-bold text-center mt-2 max-w-[300px]">
-          Your portfolio inventory is empty. Add assets to see the analysis.
-        </p>
-      </div>
-    );
-  }
+  const currentTheme = colorsMap[accentColor];
 
   return (
-    <div className="space-y-12">
-      {/* Header */}
-      <div className="p-6 bg-purple-50 rounded-2xl border border-purple-100 flex flex-col md:flex-row items-center justify-between gap-4">
-         <div>
-            <h2 className="text-xl md:text-2xl font-black text-purple-900 tracking-tighter">Portfolio Concentration</h2>
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
-              <p className="text-sm text-purple-600 font-extrabold uppercase tracking-widest opacity-80">
-                Analyzing {stocks.length} assets across {sectorData.length} sectors
-              </p>
-              {isUsingCostBasis && (
-                <div className="flex items-center gap-2 text-[10px] bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200 font-black uppercase overflow-hidden animate-in fade-in slide-in-from-left-2 transition-all">
-                  <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
-                  Showing Cost Basis (Refresh for Market Prices)
-                </div>
-              )}
-            </div>
-         </div>
+    <div className="space-y-8">
+      <div className="flex items-center gap-3">
+        <div className={`${currentTheme.bg} p-2 rounded-lg`}>
+          <BarChart3 className={`w-5 h-5 ${currentTheme.text}`} />
+        </div>
+        <h2 className="text-xl font-black text-[#111827] tracking-tight uppercase tracking-tighter">{title}</h2>
       </div>
 
       <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 md:gap-12 items-start">
-        
-        {/* SECTION 1: STOCK PERCENTAGES */}
+        {/* SECTION 1: ASSET PERCENTAGES */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="bg-blue-100 p-2 rounded-lg">
-              <BarChart3 className="w-5 h-5 text-blue-600" />
-            </div>
-            <h3 className="text-lg font-black text-[#111827] tracking-tight uppercase text-xs md:text-sm">Percentage by Stock</h3>
+            <h3 className="text-[10px] md:text-xs font-black text-slate-400 tracking-widest uppercase">Percentage by {typeLabel}</h3>
           </div>
           
-          <div className="bg-white border-2 border-slate-50 rounded-3xl p-6 md:p-8 shadow-sm space-y-4 max-h-[600px] overflow-y-auto custom-scrollbar">
-            {stockData.map((data, index) => (
+          <div className="bg-white border-2 border-slate-50 rounded-3xl p-6 md:p-8 shadow-sm space-y-4 max-h-[500px] overflow-y-auto custom-scrollbar">
+            {assetData.map((data, index) => (
               <div key={data.ticker} className="group relative">
                 <div className="flex justify-between items-end mb-2">
                   <div className="flex items-center gap-2">
-                    <span className="w-6 h-6 flex items-center justify-center text-[10px] font-black text-slate-300 group-hover:text-blue-500 transition-colors border border-slate-100 rounded-md">
+                    <span className="w-6 h-6 flex items-center justify-center text-[10px] font-black text-slate-300 transition-colors border border-slate-100 rounded-md">
                       {index + 1}
                     </span>
-                    <span className="font-extrabold text-[#111827] group-hover:text-blue-600 transition-colors">{data.ticker}</span>
+                    <span className={`font-extrabold text-[#111827] transition-colors ${currentTheme.hover}`}>{data.ticker}</span>
                   </div>
-                  <div className="flex flex-col items-end">
-                    <span className="text-sm font-black text-[#111827]">{data.percent.toFixed(2)}%</span>
-                  </div>
+                  <span className="text-sm font-black text-[#111827]">{data.percent.toFixed(2)}%</span>
                 </div>
                 <div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100/50">
                   <div 
-                    className="h-full bg-blue-500 rounded-full transition-all duration-1000 ease-out" 
+                    className={`h-full ${currentTheme.bar} rounded-full transition-all duration-1000 ease-out`} 
                     style={{ width: `${data.percent}%` }}
                   />
                 </div>
@@ -127,13 +110,10 @@ export function SectorAnalytics({ stocks }: SectorAnalyticsProps) {
         {/* SECTION 2: SECTOR PERCENTAGES */}
         <div className="space-y-6">
           <div className="flex items-center gap-3 mb-2">
-            <div className="bg-purple-100 p-2 rounded-lg">
-              <PieIcon className="w-5 h-5 text-purple-600" />
-            </div>
-            <h3 className="text-lg font-black text-[#111827] tracking-tight uppercase text-xs md:text-sm">Percentage by Sector</h3>
+            <h3 className="text-[10px] md:text-xs font-black text-slate-400 tracking-widest uppercase">Percentage by Sector</h3>
           </div>
 
-          <div className="bg-white border-2 border-purple-100/30 rounded-3xl p-6 md:p-8 shadow-sm space-y-8">
+          <div className="bg-white border-2 border-slate-50 rounded-3xl p-6 md:p-8 shadow-sm space-y-8">
             {/* Pie Chart */}
             <div className="bg-slate-50/50 rounded-2xl p-4 flex flex-col items-center justify-center border border-slate-100 min-h-[300px]">
               <ResponsiveContainer width="100%" height={300}>
@@ -180,7 +160,7 @@ export function SectorAnalytics({ stocks }: SectorAnalyticsProps) {
                   <div className="flex justify-between items-center mb-2">
                     <div className="flex items-center gap-3">
                       <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: COLORS[index % COLORS.length] }} />
-                      <span className="font-extrabold text-[#111827] text-sm uppercase tracking-tight group-hover:text-purple-600 transition-colors">{data.name}</span>
+                      <span className={`font-extrabold text-[#111827] text-sm uppercase tracking-tight transition-colors ${currentTheme.hover}`}>{data.name}</span>
                     </div>
                     <span className="text-sm font-black text-[#111827]">{data.percent.toFixed(1)}%</span>
                   </div>
@@ -198,8 +178,71 @@ export function SectorAnalytics({ stocks }: SectorAnalyticsProps) {
             </div>
           </div>
         </div>
-
       </div>
     </div>
   );
 }
+
+export function SectorAnalytics({ stocks, crypto = [] }: SectorAnalyticsProps) {
+  const isUsingCostBasis = (stocks.length > 0 && stocks.every(s => (s.currentPrice || 0) === 0)) || 
+                           (crypto.length > 0 && crypto.every(c => (c.currentPrice || 0) === 0));
+
+  if (stocks.length === 0 && crypto.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center py-20 px-6 border-2 border-dashed border-slate-100 rounded-3xl bg-slate-50/30">
+        <div className="bg-white p-4 rounded-full shadow-sm mb-4">
+          <PieIcon size={32} className="text-slate-200" />
+        </div>
+        <h3 className="text-lg font-extrabold text-slate-800 tracking-tight">No Portfolio Data Available</h3>
+        <p className="text-slate-400 text-sm font-bold text-center mt-2 max-w-[300px]">
+          Your portfolio inventory is empty. Add assets to see the analysis.
+        </p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-20">
+      {/* Header */}
+      <div className="p-6 bg-purple-50 rounded-2xl border border-purple-100 flex flex-col md:flex-row items-center justify-between gap-4">
+         <div>
+            <h2 className="text-xl md:text-2xl font-black text-purple-900 tracking-tighter">Portfolio Concentration</h2>
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 mt-1">
+              <p className="text-sm text-purple-600 font-extrabold uppercase tracking-widest opacity-80">
+                Analyzing {stocks.length + crypto.length} assets across all sectors
+              </p>
+              {isUsingCostBasis && (
+                <div className="flex items-center gap-2 text-[10px] bg-amber-100 text-amber-700 px-3 py-1 rounded-full border border-amber-200 font-black uppercase overflow-hidden animate-in fade-in slide-in-from-left-2 transition-all">
+                  <span className="w-1.5 h-1.5 bg-amber-500 rounded-full animate-pulse" />
+                  Showing Cost Basis (Refresh for Market Prices)
+                </div>
+              )}
+            </div>
+         </div>
+      </div>
+
+      {stocks.length > 0 && (
+        <DistributionView 
+          assets={stocks} 
+          title="Stock Intelligence" 
+          accentColor="blue" 
+          typeLabel="Stock"
+        />
+      )}
+
+      {stocks.length > 0 && crypto.length > 0 && (
+        <div className="border-t border-slate-100 pt-16" />
+      )}
+
+      {crypto.length > 0 && (
+        <DistributionView 
+          assets={crypto} 
+          title="Crypto Intelligence" 
+          accentColor="orange" 
+          typeLabel="Asset"
+        />
+      )}
+    </div>
+  );
+}
+

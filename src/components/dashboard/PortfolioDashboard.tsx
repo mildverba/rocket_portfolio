@@ -516,7 +516,7 @@ return (
                 </TabsList>
                 
                 <TabsContent value="sector" className="m-0 bg-white min-h-[400px] rounded-3xl p-6 lg:p-8 shadow-sm border border-slate-100">
-                  <SectorAnalytics stocks={stocks} />
+                  <SectorAnalytics stocks={stocks} crypto={crypto} />
                 </TabsContent>
                 
                 <TabsContent value="charts" className="m-0 bg-white min-h-[400px] rounded-3xl p-6 lg:p-8 shadow-sm border border-slate-100 flex flex-col space-y-6">
