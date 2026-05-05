@@ -23,7 +23,7 @@ export function Sidebar() {
           Rocket Portfolio
         </h2>
       </div>
-      <nav className="flex-1 px-4 space-y-2">
+      <nav className="flex-1 px-4 space-y-2 flex flex-col">
         <Link 
           href="/" 
           className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
@@ -32,8 +32,10 @@ export function Sidebar() {
               : "text-muted-foreground hover:text-primary hover:bg-muted"
           }`}
         >
-          <LayoutDashboard className="w-4 h-4" />
-          Dashboard
+          <div className="w-5 flex justify-center shrink-0">
+            <LayoutDashboard className="w-4 h-4" />
+          </div>
+          <span>Dashboard</span>
         </Link>
         <Link 
           href="/sector-analysis" 
@@ -43,19 +45,23 @@ export function Sidebar() {
               : "text-muted-foreground hover:text-primary hover:bg-muted"
           }`}
         >
-          <PieChart className="w-4 h-4" />
-          Analytics
+          <div className="w-5 flex justify-center shrink-0">
+            <PieChart className="w-4 h-4" />
+          </div>
+          <span>Analytics</span>
         </Link>
         <Link 
           href="/charts" 
-          className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors pl-7 ${
+          className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
             pathname === "/charts" 
               ? "text-primary font-medium bg-primary/10" 
               : "text-muted-foreground hover:text-primary hover:bg-muted"
           }`}
         >
-          <LineChart className="w-4 h-4" />
-          Charts
+          <div className="w-5 flex justify-center shrink-0">
+            <LineChart className="w-4 h-4" />
+          </div>
+          <span>Charts</span>
         </Link>
       </nav>
       <div className="p-6 border-t mt-auto space-y-4">
