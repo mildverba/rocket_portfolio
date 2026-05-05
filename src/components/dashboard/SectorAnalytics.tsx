@@ -21,12 +21,14 @@ function DistributionView({
   assets, 
   title, 
   accentColor = "blue",
-  typeLabel = "Asset"
+  typeLabel = "Asset",
+  bottomLeftContent
 }: { 
   assets: Asset[], 
   title: string, 
   accentColor?: "blue" | "purple" | "orange",
-  typeLabel?: string
+  typeLabel?: string,
+  bottomLeftContent?: React.ReactNode
 }) {
   const total = assets.reduce((acc, curr) => acc + getValue(curr), 0);
   
@@ -105,6 +107,8 @@ function DistributionView({
               </div>
             ))}
           </div>
+
+          {bottomLeftContent}
         </div>
 
         {/* SECTION 2: SECTOR PERCENTAGES */}
@@ -240,6 +244,31 @@ export function SectorAnalytics({ stocks, crypto = [] }: SectorAnalyticsProps) {
           title="Crypto Intelligence" 
           accentColor="orange" 
           typeLabel="Asset"
+          bottomLeftContent={
+            <div className="bg-orange-50 border border-orange-200 rounded-2xl p-5 md:p-6 mt-6 shadow-sm">
+              <h3 className="text-sm md:text-base font-extrabold text-orange-900 tracking-tight mb-4">
+                Expected Target Allocation
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3">
+                {[
+                  { name: "BTC", value: "15%" },
+                  { name: "ETH", value: "30%" },
+                  { name: "SOL", value: "15%" },
+                  { name: "TON", value: "20%" },
+                  { name: "L2", value: "3%" },
+                  { name: "Move L1 (APT+SUI)", value: "10%" },
+                  { name: "AI (NEAR)", value: "4%" },
+                  { name: "RWA (ONDO)", value: "1%" },
+                  { name: "Speculative", value: "2%" },
+                ].map(item => (
+                  <div key={item.name} className="flex justify-between items-center text-sm">
+                    <span className="font-semibold text-orange-800 tracking-tight">{item.name}</span>
+                    <span className="font-black text-orange-900">~ {item.value}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          }
         />
       )}
     </div>
