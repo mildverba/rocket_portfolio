@@ -185,7 +185,7 @@ return (
       {activeTab !== "analytics" && (
         <>
         {/* UPPER SECTION (Responsive grid) */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 lg:min-h-[300px]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 lg:min-h-[300px]">
         
         {/* Summary Card */}
         <Card className={cardClassName}>
@@ -216,53 +216,6 @@ return (
               <div className="flex flex-col gap-1">
                 <span className="text-[11px] font-bold text-slate-400 uppercase tracking-wide">Crypto</span>
                 <span className="text-sm md:text-base font-extrabold text-[#111827]">€{cryptoTotal.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
-              </div>
-            </div>
-            <div className="pt-4 mt-auto">
-              <Link href="/sector-analysis" className="w-full flex items-center justify-center gap-2 bg-purple-50 text-purple-700 py-3 rounded-xl text-xs font-bold hover:bg-purple-100 transition-colors border border-purple-100">
-                <PieIcon size={14} />
-                View Detailed Intelligence
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Asset Allocation Card (Enhanced Split) */}
-        <Card className={cardClassName}>
-          <CardHeader className="py-4 md:py-5 px-5 md:px-6 flex flex-row items-center justify-between">
-            <CardTitle className={headerTitleClass}>Allocation Strategy</CardTitle>
-            <PieIcon size={16} className="text-slate-300" />
-          </CardHeader>
-          <CardContent className="px-5 md:px-6 pb-6 grid grid-cols-2 gap-3 md:gap-4 h-full">
-            {/* Left: Strategy */}
-            <div className="flex flex-col border-r border-slate-50 pr-2">
-              <span className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-2 md:mb-3 text-center tracking-widest">Strategy</span>
-              <div className="flex-1 min-h-[120px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RePieChart>
-                    <Pie data={groupData} innerRadius={22} outerRadius={32} dataKey="value" paddingAngle={4}>
-                      {groupData.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <ReLegend content={renderCustomLegend} />
-                  </RePieChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-            {/* Right: Asset Split */}
-            <div className="flex flex-col pl-2">
-              <span className="text-[9px] md:text-[10px] font-bold text-slate-400 uppercase mb-2 md:mb-3 text-center tracking-widest">Type Split</span>
-              <div className="flex-1 min-h-[120px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <RePieChart>
-                    <Pie data={classSplitData} innerRadius={22} outerRadius={32} dataKey="value" paddingAngle={8}>
-                      <Cell fill="#A855F7" />
-                      <Cell fill="#F97316" />
-                    </Pie>
-                    <ReLegend content={renderCustomLegend} />
-                  </RePieChart>
-                </ResponsiveContainer>
               </div>
             </div>
           </CardContent>
