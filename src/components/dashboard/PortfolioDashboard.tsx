@@ -543,11 +543,12 @@ return (
                   </div>
                   <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6">
                     <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
-                      WRESBAL <span className="font-bold text-amber-700">(bank reserves)</span>. Key signals:
+                      WRESBAL <span className="font-bold text-amber-700">(bank reserves)</span>
                     </h3>
-                    <ol className="mt-3 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
-                      <li>Sustained above ~$3.1–3.2 trillion</li>
-                      <li>Growing for 2–4 consecutive weeks</li>
+                    <p className="mt-3 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+                    <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+                      <li>устойчиво выше ~$3.1–3.2 трлн</li>
+                      <li>и растёт 2–4 недели подряд</li>
                     </ol>
                   </div>
                   <TradingViewChart symbol="WRESBAL" />
