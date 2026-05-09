@@ -21,8 +21,8 @@ export function MmfWidget() {
       } else {
          throw new Error("Invalid format");
       }
-    } catch (e: any) {
-      setError(e.message || "Error fetching data");
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : "Error fetching data");
     } finally {
       setLoading(false);
     }

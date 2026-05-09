@@ -19,7 +19,7 @@ export async function GET() {
     const sheetName = workbook.SheetNames[0];
     const sheet = workbook.Sheets[sheetName];
     
-    const json = xlsx.utils.sheet_to_json<any[]>(sheet, { header: 1 });
+    const json = xlsx.utils.sheet_to_json<unknown[]>(sheet, { header: 1 });
     const data: { date: string, total: number }[] = [];
     
     for (const row of json) {
@@ -61,7 +61,7 @@ export async function GET() {
     const last4 = data.slice(0, 4);
     
     return NextResponse.json({ data: last4 });
-  } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (error: unknown) {
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Unknown error" }, { status: 500 });
   }
 }

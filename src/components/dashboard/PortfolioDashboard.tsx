@@ -2,25 +2,13 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RefreshCw, TrendingUp, TrendingDown, PieChart as PieIcon, Layers, Briefcase, FileSpreadsheet } from "lucide-react";
+import { RefreshCw, TrendingUp, TrendingDown, Layers, Briefcase, FileSpreadsheet } from "lucide-react";
 import { Asset } from "@/lib/types";
 import { SectorAnalytics } from "./SectorAnalytics";
 import { exportAssetsToExcel } from "@/lib/exportUtils";
 import { TradingViewChart } from "./TradingViewChart";
 import { MmfWidget } from "./MmfWidget";
-import {
-  PieChart as RePieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  Legend as ReLegend
-} from "recharts";
 
-const COLORS = ["#A855F7", "#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#f43f5e", "#8b5cf6", "#3b82f6"];
 const CRYPTO_COLORS = ["#A855F7", "#fbbf24", "#94a3b8"];
 
 import { fetchPortfolioData } from "@/actions/sheets";
@@ -113,6 +101,7 @@ export function PortfolioDashboard({
   const brokerList = Object.entries(brokerStats).sort((a, b) => b[1] - a[1]);
 
   // Group Stats (Stocks only)
+  /*
   const groupStats: Record<string, number> = {};
   stocks.forEach(asset => {
     groupStats[asset.group] = (groupStats[asset.group] || 0) + (asset.shares * asset.currentPrice);
@@ -122,6 +111,7 @@ export function PortfolioDashboard({
     value,
     percent: stocksTotal > 0 ? (value / stocksTotal) * 100 : 0
   }));
+  */
 
   // Crypto Stats
   let btcVal = 0, ethVal = 0, othersVal = 0;
@@ -138,14 +128,17 @@ export function PortfolioDashboard({
     { name: "Others", value: othersVal, percent: cryptoTotal > 0 ? (othersVal/cryptoTotal)*100 : 0 },
   ].filter(d => d.value > 0);
 
+  /*
   const classSplitData = [
     { name: "Stocks", value: stocksTotal, percent: portfolioTotal > 0 ? (stocksTotal/portfolioTotal)*100 : 0 },
     { name: "Crypto", value: cryptoTotal, percent: portfolioTotal > 0 ? (cryptoTotal/portfolioTotal)*100 : 0 },
   ].filter(d => d.value > 0);
+  */
 
 const cardClassName = "bg-white shadow-md border-none rounded-xl flex flex-col";
 const headerTitleClass = "text-[12px] font-bold text-slate-400 uppercase tracking-widest opacity-80";
 
+/*
 const renderCustomLegend = (props: any) => {
   const { payload } = props;
   return (
@@ -162,6 +155,7 @@ const renderCustomLegend = (props: any) => {
     </ul>
   );
 };
+*/
 
 return (
   <div className="min-h-screen bg-white text-[#111827] font-sans selection:bg-purple-100 antialiased tracking-tight">
