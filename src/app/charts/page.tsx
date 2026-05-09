@@ -174,6 +174,21 @@ export default function ChartsPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10 mt-8">
           <TradingViewChart symbol="CRYPTOCAP:TOTAL3" />
         </div>
+
+        <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6 mt-8">
+          <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight leading-relaxed">
+            DXY = U.S. Dollar Index (Крипта исторически любит: weak dollar)
+          </h3>
+          <p className="mt-4 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+          <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+            <li>DXY ↓ = bullish for crypto</li>
+            <li>DXY ↑ резко = ветер против</li>
+          </ol>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10 mt-8">
+          <TradingViewChart symbol="TVC:DXY" />
+        </div>
       </div>
     </div>
   );
