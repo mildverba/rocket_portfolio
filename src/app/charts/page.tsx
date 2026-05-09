@@ -208,7 +208,7 @@ export default function ChartsPage() {
         </div>
 
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10 mt-8">
-          <TradingViewChart symbol="TVC:DXY" />
+          <TradingViewChart symbol="CAPITALCOM:DXY" />
         </div>
       </div>
     </div>
