@@ -77,7 +77,7 @@ export default function ChartsPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10 mt-8">
           <TradingViewChart 
             symbol="US10Y" 
-            overlays={[{ symbol: "CBOE:VIX", color: "#EAB308" }]} 
+            overlays={[{ symbol: "CAPITALCOM:VIX", color: "#EAB308" }]} 
           />
         </div>
 
