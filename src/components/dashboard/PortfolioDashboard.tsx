@@ -442,7 +442,8 @@ return (
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Current Price (USD)</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Market Value (EUR)</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Market Value (USD)</th>
-                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right pr-10">PnL Performance</th>
+                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Total P&L (EUR)</th>
+                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right pr-10">Total P&L (USD)</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
@@ -455,6 +456,7 @@ return (
                     const avgPriceUsd = asset.avgPrice * eurUsdRate;
                     const currentPriceUsd = asset.currentPrice * eurUsdRate;
                     const valueUsd = value * eurUsdRate;
+                    const pnlUsd = pnl * eurUsdRate;
 
                     return (
                       <tr key={asset.ticker} className="hover:bg-slate-50/40 transition-colors group">
@@ -467,35 +469,43 @@ return (
                         <td className="px-4 py-7 text-right">
                           <span className="text-sm font-extrabold text-[#111827] tabular-nums">{asset.shares.toLocaleString(undefined, { maximumFractionDigits: 8 })}</span>
                         </td>
-                        <td className="px-4 py-7 text-right font-mono text-xs text-slate-400 tabular-nums">
+                        <td className="px-4 py-7 text-right font-mono text-xs text-slate-500 font-medium tabular-nums">
                           €{asset.avgPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}
                         </td>
-                        <td className="px-4 py-7 text-right font-mono text-xs text-slate-400/80 tabular-nums">
+                        <td className="px-4 py-7 text-right font-mono text-xs text-[#111827] font-extrabold tabular-nums">
                           ${avgPriceUsd.toLocaleString(undefined, { minimumFractionDigits: 4 })}
                         </td>
                         <td className={`px-4 py-7 text-right font-mono text-xs tabular-nums ${
                           asset.currentPrice === 0 
-                            ? "text-red-600 font-bold" 
+                            ? "text-red-600 font-medium" 
                             : asset.priceSource === 'sheet'
-                              ? "text-blue-600 font-bold"
-                              : "font-extrabold text-[#111827]"
+                              ? "text-blue-600 font-medium"
+                              : "font-medium text-slate-500"
                         }`}>
                           €{asset.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}
                         </td>
-                        <td className="px-4 py-7 text-right font-mono text-xs tabular-nums text-slate-500 font-semibold">
+                        <td className="px-4 py-7 text-right font-mono text-xs text-[#111827] font-extrabold tabular-nums">
                           ${currentPriceUsd.toLocaleString(undefined, { minimumFractionDigits: 4 })}
                         </td>
                         <td className="px-4 py-7 text-right">
-                          <span className="text-base font-extrabold text-[#111827] tabular-nums">€{value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                          <span className="text-base font-medium text-slate-500 tabular-nums">€{value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                         </td>
                         <td className="px-4 py-7 text-right">
-                          <span className="text-sm font-bold text-slate-500 tabular-nums">${valueUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                          <span className="text-base font-extrabold text-[#111827] tabular-nums">${valueUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                        </td>
+                        <td className="px-4 py-7 text-right">
+                          <div className={`text-sm font-medium flex flex-col items-end ${pnl >= 0 ? "text-green-600/80" : "text-red-500/80"}`}>
+                            <div className="flex items-center gap-1.5">
+                              {pnl >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
+                              <span>{pnl >= 0 ? "+" : "-"}€{Math.abs(pnl).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                            </div>
+                          </div>
                         </td>
                         <td className="px-4 py-7 text-right pr-10">
                           <div className={`text-sm font-extrabold flex flex-col items-end ${pnl >= 0 ? "text-green-600" : "text-red-500"}`}>
                             <div className="flex items-center gap-1.5">
                               {pnl >= 0 ? <TrendingUp size={14} /> : <TrendingDown size={14} />}
-                              <span>{pnl >= 0 ? "+" : "-"}€{Math.abs(pnl).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                              <span>{pnl >= 0 ? "+" : "-"}${Math.abs(pnlUsd).toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                             </div>
                             <span className="text-[11px] opacity-80 mt-1">{pnl >= 0 ? "+" : ""}{pnlPerc.toFixed(1)}% efficiency</span>
                           </div>
