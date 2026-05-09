@@ -323,21 +323,20 @@ return (
                   <tr className="bg-slate-50/50">
                     <th className="sticky left-0 z-30 bg-slate-50/95 backdrop-blur-sm px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest pl-10 border-r border-slate-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Ticker</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Qty</th>
-                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Avg Price</th>
-                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Market Value</th>
+                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Purchase Price (EUR)</th>
+                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Current Price (EUR)</th>
+                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Current Price (USD)</th>
+                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Market Value (USD)</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Total P&L</th>
-                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Price (EUR)</th>
-                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Price (USD)</th>
-                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest">Company Name</th>
-                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right pr-10">Broker</th>
+                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest pr-10">Company Name</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
                   {stocks.map((asset) => {
                     const value = asset.shares * asset.currentPrice;
+                    const valueUsd = asset.currentPriceUsd ? (asset.shares * asset.currentPriceUsd) : (asset.shares * asset.currentPrice * 1.10);
                     const pnl = value - (asset.shares * asset.avgPrice);
                     const pnlPerc = asset.avgPrice > 0 ? (pnl / (asset.shares * asset.avgPrice)) * 100 : 0;
-                    const brokers = asset.breakdown?.map(b => b.broker).join(", ") || "N/A";
 
                     return (
                       <tr key={asset.ticker} className="hover:bg-slate-50/40 transition-colors group">
@@ -353,8 +352,14 @@ return (
                         <td className="px-4 py-6 text-right font-mono text-xs text-slate-400 tabular-nums">
                           €{asset.avgPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
                         </td>
+                        <td className="px-4 py-6 text-right font-mono text-xs font-extrabold text-[#111827] tabular-nums">
+                          €{asset.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                        </td>
+                        <td className="px-4 py-6 text-right font-mono text-xs text-slate-500 tabular-nums">
+                          ${asset.currentPriceUsd?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "-"}
+                        </td>
                         <td className="px-4 py-6 text-right">
-                          <span className="text-base font-extrabold text-[#111827] tabular-nums">€{value.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
+                          <span className="text-base font-extrabold text-[#111827] tabular-nums">${valueUsd.toLocaleString(undefined, { maximumFractionDigits: 0 })}</span>
                         </td>
                         <td className="px-4 py-6 text-right">
                           <div className={`text-sm font-extrabold flex flex-col items-end ${pnl >= 0 ? "text-green-600" : "text-red-500"}`}>
@@ -362,17 +367,8 @@ return (
                             <span className="text-[11px] opacity-80 mt-1">{pnl >= 0 ? "+" : ""}{pnlPerc.toFixed(1)}%</span>
                           </div>
                         </td>
-                        <td className="px-4 py-6 text-right font-mono text-xs font-extrabold text-[#111827] tabular-nums">
-                          €{asset.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 2 })}
-                        </td>
-                        <td className="px-4 py-6 text-right font-mono text-xs text-slate-500 tabular-nums">
-                          ${asset.currentPriceUsd?.toLocaleString(undefined, { minimumFractionDigits: 2 }) || "-"}
-                        </td>
-                        <td className="px-4 py-6">
+                        <td className="px-4 py-6 pr-10">
                           <span className="text-sm font-bold text-slate-600 max-w-[220px] truncate block tracking-tight">{asset.name || asset.ticker}</span>
-                        </td>
-                        <td className="px-4 py-6 text-right pr-10">
-                          <span className="text-[11px] font-extrabold bg-slate-100 text-slate-600 px-3 py-1.5 rounded-lg border border-slate-200/50 uppercase tracking-tight">{brokers}</span>
                         </td>
                       </tr>
                     );
