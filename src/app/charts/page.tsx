@@ -186,7 +186,7 @@ export default function ChartsPage() {
           <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
             <li>BTC растёт, TOTAL3 стоит -&gt; Ложный risk-on (деньги идут только в BTC, институционалы risk-on, но альты ещё нет). Не альтсезон.</li>
             <li>TOTAL3 перестал падать, делает higher low, ломает downtrend -&gt; Капитал начинает искать риск, альты просыпаются</li>
-            <li>TOTAL3 начинает ускоряться, выше 200 MA (Indicators → Moving Average = Length = 200) -&gt; деньги реально заходят в альты</li>
+            <li>TOTAL3 начинает ускоряться, выше 200 MA (Indicators → Simple Moving Average = Length = 200) -&gt; деньги реально заходят в альты (график total3 смотри на 1D)</li>
             <li>TOTAL3 растёт быстрее BTC -&gt; начинается перераспределение риска</li>
             <li>TOTAL3 вертикален -&gt; эйфория, летят x5–x20</li>
           </ol>
