@@ -60,6 +60,27 @@ export default function ChartsPage() {
           <TradingViewChart symbol="FRED:RRPONTSYD" />
         </div>
 
+        <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6 mt-8">
+          <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight leading-relaxed">
+            US10Y = доходность 10-летних облигаций США
+            <br />
+            VIX = CBOE Volatility Index (ИНДЕКС СТРАХА)
+          </h3>
+          <p className="mt-4 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+          <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+            <li>US10Y спокойный, VIX падает и &lt;20 -&gt; MOVE почти наверняка healthy (STRONG RISK-ON)</li>
+            <li>US10Y немного нервный, VIX = 18–22 -&gt; осторожный risk-on</li>
+            <li>US10Y spikes, VIX = 25 -&gt; funding stress. RISK-OFF</li>
+          </ol>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10 mt-8">
+          <TradingViewChart 
+            symbol="US10Y" 
+            overlays={[{ symbol: "CBOE:VIX", color: "#EAB308" }]} 
+          />
+        </div>
+
         <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6">
           <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
             US10Y <span className="font-bold text-amber-700">(доходность 10-летних облигаций США)</span>
