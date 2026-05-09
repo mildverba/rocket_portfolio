@@ -1,6 +1,7 @@
 "use client";
 
 import { TradingViewChart } from "@/components/dashboard/TradingViewChart";
+import { MmfWidget } from "@/components/dashboard/MmfWidget";
 
 export default function ChartsPage() {
   return (
@@ -102,49 +103,7 @@ export default function ChartsPage() {
           <TradingViewChart symbol="US02Y" />
         </div>
 
-        <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6 mt-8">
-          <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
-            MMF <span className="font-bold text-amber-700">(Money Market Funds)</span>
-          </h3>
-          <p className="mt-3 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
-          <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
-            <li>Несколько недель подряд оттоки</li>
-            <li>Не один скачок, а тренд (деньги реально выходят из кэша)</li>
-          </ol>
-          
-          <div className="mt-6 border border-amber-200/60 rounded-xl overflow-hidden bg-white shadow-sm max-h-[400px] overflow-y-auto custom-scrollbar">
-            <table className="w-full text-left border-collapse">
-              <thead className="sticky top-0 bg-slate-50/95 backdrop-blur-sm z-10 border-b border-slate-200">
-                <tr>
-                  <th className="py-3 px-4 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest">Date</th>
-                  <th className="py-3 px-4 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Total MMF Assets</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">05/06/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,748.81B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">04/29/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,626.46B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">04/22/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,637.44B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">04/15/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,643.00B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">04/08/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,818.81B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">04/01/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,810.85B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">03/25/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,803.27B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">03/18/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,856.28B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">03/11/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,817.60B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">03/04/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,816.83B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">02/25/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,796.72B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">02/18/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,791.02B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">02/11/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,773.89B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">02/04/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,796.59B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">01/28/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,711.57B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">01/21/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,698.52B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">01/14/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,729.36B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">01/07/2026</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,804.10B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">12/30/2025</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,733.31B</td></tr>
-                <tr className="hover:bg-slate-50/50 transition-colors"><td className="py-2.5 px-4 text-xs font-medium text-slate-500">12/23/2025</td><td className="py-2.5 px-4 text-xs font-extrabold text-[#111827] text-right">$7,673.39B</td></tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
+        <MmfWidget />
       </div>
     </div>
   );
