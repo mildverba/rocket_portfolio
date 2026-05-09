@@ -1,7 +1,9 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import { useState } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RefreshCw, TrendingUp, TrendingDown, Layers, Briefcase, FileSpreadsheet } from "lucide-react";
 import { Asset } from "@/lib/types";
 import { SectorAnalytics } from "./SectorAnalytics";
