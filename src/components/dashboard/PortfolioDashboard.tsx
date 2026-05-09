@@ -402,8 +402,11 @@ return (
                     <th className="sticky left-0 z-30 bg-slate-50/95 backdrop-blur-sm px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest pl-10 border-r border-slate-200 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.05)]">Ticker</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Quantity</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Purchase Price (EUR)</th>
+                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Purchase Price (USD)</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Current Price (EUR)</th>
+                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Current Price (USD)</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Market Value (EUR)</th>
+                    <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right">Market Value (USD)</th>
                     <th className="px-4 py-5 text-[10px] font-extrabold uppercase text-slate-400 tracking-widest text-right pr-10">PnL Performance</th>
                   </tr>
                 </thead>
@@ -412,6 +415,11 @@ return (
                     const value = asset.shares * asset.currentPrice;
                     const pnl = value - (asset.shares * asset.avgPrice);
                     const pnlPerc = asset.avgPrice > 0 ? (pnl / (asset.shares * asset.avgPrice)) * 100 : 0;
+                    
+                    const eurUsdRate = (asset.currentPriceUsd && asset.currentPrice > 0) ? (asset.currentPriceUsd / asset.currentPrice) : 1.10;
+                    const avgPriceUsd = asset.avgPrice * eurUsdRate;
+                    const currentPriceUsd = asset.currentPrice * eurUsdRate;
+                    const valueUsd = value * eurUsdRate;
 
                     return (
                       <tr key={asset.ticker} className="hover:bg-slate-50/40 transition-colors group">
@@ -427,6 +435,9 @@ return (
                         <td className="px-4 py-7 text-right font-mono text-xs text-slate-400 tabular-nums">
                           €{asset.avgPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}
                         </td>
+                        <td className="px-4 py-7 text-right font-mono text-xs text-slate-400/80 tabular-nums">
+                          ${avgPriceUsd.toLocaleString(undefined, { minimumFractionDigits: 4 })}
+                        </td>
                         <td className={`px-4 py-7 text-right font-mono text-xs tabular-nums ${
                           asset.currentPrice === 0 
                             ? "text-red-600 font-bold" 
@@ -436,8 +447,14 @@ return (
                         }`}>
                           €{asset.currentPrice.toLocaleString(undefined, { minimumFractionDigits: 4 })}
                         </td>
+                        <td className="px-4 py-7 text-right font-mono text-xs tabular-nums text-slate-500 font-semibold">
+                          ${currentPriceUsd.toLocaleString(undefined, { minimumFractionDigits: 4 })}
+                        </td>
                         <td className="px-4 py-7 text-right">
                           <span className="text-base font-extrabold text-[#111827] tabular-nums">€{value.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
+                        </td>
+                        <td className="px-4 py-7 text-right">
+                          <span className="text-sm font-bold text-slate-500 tabular-nums">${valueUsd.toLocaleString(undefined, { maximumFractionDigits: 2 })}</span>
                         </td>
                         <td className="px-4 py-7 text-right pr-10">
                           <div className={`text-sm font-extrabold flex flex-col items-end ${pnl >= 0 ? "text-green-600" : "text-red-500"}`}>
