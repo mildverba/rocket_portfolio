@@ -27,7 +27,7 @@ export function TradingViewChart({ symbol = 'WRESBAL', overlays = [] }: { symbol
     script.type = "text/javascript";
     script.async = true;
 
-    const widgetConfig: any = {
+    const widgetConfig: Record<string, unknown> = {
       autosize: true,
       symbol: symbol,
       interval: "W",
