@@ -156,6 +156,24 @@ export default function ChartsPage() {
         <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10 mt-8">
           <TradingViewChart symbol="BINANCE:ETHBTC" />
         </div>
+
+        <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6 mt-8">
+          <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight leading-relaxed">
+            TOTAL3 = вся крипта без BTC и ETH (идут ли деньги в альты?)
+          </h3>
+          <p className="mt-4 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+          <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+            <li>BTC растёт, TOTAL3 стоит -&gt; Ложный risk-on (деньги идут только в BTC, институционалы risk-on, но альты ещё нет). Не альтсезон.</li>
+            <li>TOTAL3 перестал падать, делает higher low, ломает downtrend -&gt; Капитал начинает искать риск, альты просыпаются</li>
+            <li>TOTAL3 начинает ускоряться, выше 200 MA (Indicators → Moving Average = Length = 200) -&gt; деньги реально заходят в альты</li>
+            <li>TOTAL3 растёт быстрее BTC -&gt; начинается перераспределение риска</li>
+            <li>TOTAL3 вертикален -&gt; эйфория, летят x5–x20</li>
+          </ol>
+        </div>
+
+        <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-10 mt-8">
+          <TradingViewChart symbol="CRYPTOCAP:TOTAL3" />
+        </div>
       </div>
     </div>
   );
