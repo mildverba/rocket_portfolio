@@ -610,6 +610,27 @@ return (
                   </div>
                   <TradingViewChart symbol="US02Y" />
                   <MmfWidget />
+
+                  <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6 mt-8">
+                    <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight leading-relaxed">
+                      <span className="text-amber-700">SOFR</span> = ставка, под которую банки/фонды занимают деньги overnight под залог Treasuries (цена краткосрочной ликвидности в системе)
+                      <br />
+                      <span className="text-amber-700">DFF</span> = Effective Federal Funds Rate (реальная overnight ставка между банками США, по которой банки занимают друг у друга резервы.)
+                    </h3>
+                    <p className="mt-4 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+                    <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+                      <li>SOFR ≈ DFF -&gt; норм (liquidity fine, repo market здоров, банки спокойно занимают деньги, хорошо для акций и крипты)</li>
+                      <li>SOFR сильно выше DFF -&gt; stress (проблемы с funding). Нехватка ликвидности. Repo stress</li>
+                      <li>SOFR/DFF НЕ говорит “покупай”. Он говорит: “система здорова или трещит?”</li>
+                    </ol>
+                  </div>
+
+                  <div className="mt-8">
+                    <TradingViewChart 
+                      symbol="FRED:DFF" 
+                      overlays={[{ symbol: "FRED:SOFR", color: "#EAB308" }]} 
+                    />
+                  </div>
                 </TabsContent>
               </Tabs>
             </div>
