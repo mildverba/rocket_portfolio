@@ -612,6 +612,18 @@ return (
                     </div>
                   </div>
                   <TradingViewChart symbol="US02Y" />
+                  
+                  <div className="w-full bg-amber-50 border border-amber-200 rounded-2xl p-5 md:p-6 mt-8">
+                    <h3 className="text-sm md:text-base font-extrabold text-amber-900 tracking-tight">
+                      MMMFFAQ027S <span className="font-bold text-amber-700">(Money Market Funds)</span>
+                    </h3>
+                    <p className="mt-3 text-sm font-extrabold text-amber-900 tracking-tight">Главные сигналы:</p>
+                    <ol className="mt-2 space-y-1.5 list-decimal list-inside text-sm font-semibold text-amber-800 tracking-tight">
+                      <li>Несколько недель подряд оттоки</li>
+                      <li>Не один скачок, а тренд (деньги реально выходят из кэша)</li>
+                    </ol>
+                  </div>
+                  <TradingViewChart symbol="FRED:MMMFFAQ027S" />
                 </TabsContent>
               </Tabs>
             </div>
