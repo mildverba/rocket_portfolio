@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Asset } from "@/lib/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SectorAllocation, TickerAllocation } from "./AllocationAnalysis";
+import { SectorAllocation, CryptoAllocation } from "./AllocationAnalysis";
 import { RefreshCw } from "lucide-react";
 
 interface Props {
@@ -68,10 +68,10 @@ export function SectorAllocationPage({ assets: initialAssets }: Props) {
                 Сектора портфеля
               </TabsTrigger>
               <TabsTrigger
-                value="tickers"
+                value="crypto"
                 className="text-[10px] md:text-sm font-extrabold px-4 md:px-6 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm rounded-lg transition-all tracking-tight"
               >
-                По каждой акции
+                Крипто
               </TabsTrigger>
             </TabsList>
 
@@ -79,8 +79,8 @@ export function SectorAllocationPage({ assets: initialAssets }: Props) {
               <SectorAllocation allAssets={allAssets} loading={loading} />
             </TabsContent>
 
-            <TabsContent value="tickers" className="m-0">
-              <TickerAllocation allAssets={allAssets} loading={loading} />
+            <TabsContent value="crypto" className="m-0">
+              <CryptoAllocation allAssets={allAssets} loading={loading} />
             </TabsContent>
           </Tabs>
         </div>

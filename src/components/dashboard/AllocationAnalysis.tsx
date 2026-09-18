@@ -91,6 +91,7 @@ const EXPECTED_TICKERS = [
 ];
 
 const BAR_SCALE = 35;
+const CRYPTO_BAR_SCALE = 40;
 
 const getValue = (asset: Asset) => {
   const price = asset.currentPrice > 0 ? asset.currentPrice : asset.avgPrice;
@@ -99,6 +100,99 @@ const getValue = (asset: Asset) => {
 
 // Strip exchange suffix: "IWDA.L" → "IWDA", "EMIM.AS" → "EMIM"
 const normalizeTicker = (ticker: string) => ticker.split(".")[0].toUpperCase();
+
+const CRYPTO_COLORS = ["#A855F7", "#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#f43f5e", "#8b5cf6", "#3b82f6", "#ec4899", "#14b8a6"];
+
+export function CryptoAllocation({ allAssets, loading }: Props) {
+  const cryptoAssets = allAssets.filter((a) => a.group === "Crypto");
+  const cryptoTotal = cryptoAssets.reduce((acc, a) => acc + a.shares * (a.currentPrice || 0), 0);
+
+  // Group by sector from Excel
+  const sectorMap: Record<string, { value: number; tickers: { ticker: string; value: number }[] }> = {};
+  cryptoAssets.forEach((a) => {
+    const sector = a.sector?.trim() || "Other";
+    const value = a.shares * (a.currentPrice || 0);
+    if (!sectorMap[sector]) sectorMap[sector] = { value: 0, tickers: [] };
+    sectorMap[sector].value += value;
+    sectorMap[sector].tickers.push({ ticker: a.ticker, value });
+  });
+
+  const actualSectors = Object.entries(sectorMap)
+    .sort((a, b) => b[1].value - a[1].value)
+    .map(([name, data]) => ({
+      name,
+      pct: cryptoTotal > 0 ? (data.value / cryptoTotal) * 100 : 0,
+      tickers: data.tickers
+        .sort((a, b) => b.value - a.value)
+        .map((t) => ({
+          ticker: t.ticker,
+          pct: cryptoTotal > 0 ? (t.value / cryptoTotal) * 100 : 0,
+        })),
+    }));
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
+        <div className="bg-slate-50 rounded-2xl h-64 animate-pulse" />
+        <div className="space-y-4">
+          {[...Array(4)].map((_, i) => (
+            <div key={i} className="bg-slate-50 rounded-2xl p-5 h-28 animate-pulse" />
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
+      {/* Expected — пока пусто */}
+      <div className="space-y-4">
+        <h3 className="text-[10px] font-black text-slate-400 tracking-widest uppercase">Expected</h3>
+        <div className="bg-slate-50/50 border border-dashed border-slate-200 rounded-2xl p-8 flex items-center justify-center min-h-[200px]">
+          <span className="text-sm font-bold text-slate-300 tracking-tight">Coming soon</span>
+        </div>
+      </div>
+
+      {/* Actual */}
+      <div className="space-y-4">
+        <h3 className="text-[10px] font-black text-slate-400 tracking-widest uppercase">Actual</h3>
+        {cryptoAssets.length === 0 ? (
+          <div className="bg-slate-50 rounded-2xl p-8 text-center">
+            <span className="text-sm font-bold text-slate-300">Нет данных</span>
+          </div>
+        ) : (
+          <div className="space-y-4">
+            {actualSectors.map((sector, i) => (
+              <div key={sector.name} className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-black text-[#111827] text-sm tracking-tight">{sector.name}</span>
+                  <span className="text-sm font-black text-[#111827]">{sector.pct.toFixed(1)}%</span>
+                </div>
+                <div className="h-1.5 w-full bg-slate-100 rounded-full mb-3 overflow-hidden">
+                  <div
+                    className="h-full rounded-full transition-all duration-700"
+                    style={{
+                      width: `${Math.min((sector.pct / CRYPTO_BAR_SCALE) * 100, 100)}%`,
+                      backgroundColor: CRYPTO_COLORS[i % CRYPTO_COLORS.length],
+                    }}
+                  />
+                </div>
+                <div className="space-y-1.5 pl-1">
+                  {sector.tickers.map((t) => (
+                    <div key={t.ticker} className="flex justify-between items-center text-xs">
+                      <span className="font-bold text-slate-700">{t.ticker}</span>
+                      <span className="font-bold text-slate-600 tabular-nums">{t.pct.toFixed(1)}%</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
 
 interface Props {
   allAssets: Asset[];
