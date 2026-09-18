@@ -4,9 +4,9 @@ import { PortfolioDashboard } from "@/components/dashboard/PortfolioDashboard";
 import { fetchPortfolioData } from "@/actions/sheets";
 
 export default async function Home() {
-  const { assets, error, fetchTime } = await fetchPortfolioData();
+  const { assets, error, fetchTime, eurUsdRate } = await fetchPortfolioData();
 
   return (
-    <PortfolioDashboard assets={assets} error={error} fetchTime={fetchTime} />
+    <PortfolioDashboard assets={assets} error={error} fetchTime={fetchTime} initialEurUsdRate={eurUsdRate} />
   );
 }

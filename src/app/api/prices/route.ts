@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
       portfolioPercent: totalValueEur > 0 ? ((asset.shares * asset.currentPrice) / totalValueEur) * 100 : 0
     }));
 
-    return NextResponse.json({ updatedAssets: finalAssets });
+    return NextResponse.json({ updatedAssets: finalAssets, eurUsdRate });
 
   } catch (error: unknown) {
     const msg = error instanceof Error ? error.message : String(error);

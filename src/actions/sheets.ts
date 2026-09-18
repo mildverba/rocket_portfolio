@@ -2,8 +2,11 @@
 
 import { google } from "googleapis";
 import { Asset } from "@/lib/types";
+import YahooFinance from "yahoo-finance2";
 
-export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: string, fetchTime?: string }> {
+const yahooInstance = new YahooFinance();
+
+export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: string, fetchTime?: string, eurUsdRate?: number }> {
   try {
     const auth = new google.auth.GoogleAuth({
       credentials: {
@@ -141,12 +144,21 @@ export async function fetchPortfolioData(): Promise<{ assets: Asset[], error?: s
         portfolioPercent: ((asset.shares * asset.currentPrice) / totalValue) * 100
       }));
     }
+    let eurUsdRate = 1.10;
+    try {
+      const quote = await yahooInstance.quote("EURUSD=X");
+      if (quote && quote.regularMarketPrice) {
+        eurUsdRate = quote.regularMarketPrice;
+      }
+    } catch (e) {
+      console.warn("[SHEETS] Failed to fetch live EURUSD rate, using fallback 1.10", e);
+    }
 
-    return { assets, fetchTime };
+    return { assets, fetchTime, eurUsdRate };
 
   } catch (error: unknown) {
     const err = error as Error;
     console.error("Error fetching Google Sheets data:", err);
-    return { assets: [], error: "Failed to fetch portfolio data: " + err.message, fetchTime: new Date().toLocaleTimeString() };
+    return { assets: [], error: "Failed to fetch portfolio data: " + err.message, fetchTime: new Date().toLocaleTimeString(), eurUsdRate: 1.10 };
   }
 }
