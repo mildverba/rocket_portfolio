@@ -102,36 +102,57 @@ const normalizeTicker = (ticker: string) => ticker.split(".")[0].toUpperCase();
 
 interface Props {
   allAssets: Asset[];
+  loading?: boolean;
 }
 
-export function SectorAllocation({ allAssets }: Props) {
-  const total = allAssets.reduce((acc, a) => acc + getValue(a), 0);
-
-  const tickerMap: Record<string, number> = {};
+export function SectorAllocation({ allAssets, loading }: Props) {
+  // Use portfolioPercent from the prices API — already converted to EUR and summed
+  const tickerPct: Record<string, number> = {};
   const tickerPresent = new Set<string>();
   allAssets.forEach((a) => {
     const key = normalizeTicker(a.ticker);
     tickerPresent.add(key);
-    tickerMap[key] = (tickerMap[key] || 0) + getValue(a);
+    tickerPct[key] = (tickerPct[key] || 0) + (a.portfolioPercent || 0);
   });
 
   const actualSectors = EXPECTED_SECTORS.map((sector) => {
-    const sectorVal = sector.tickers.reduce(
-      (acc, t) => acc + (tickerMap[t.ticker] || 0),
+    const sectorPct = sector.tickers.reduce(
+      (acc, t) => acc + (tickerPct[t.ticker] || 0),
       0
     );
     const sectorPresent = sector.tickers.some((t) => tickerPresent.has(t.ticker));
     return {
       ...sector,
-      actualPct: total > 0 ? (sectorVal / total) * 100 : 0,
+      actualPct: sectorPct,
       sectorPresent,
       tickers: sector.tickers.map((t) => ({
         ...t,
         inPortfolio: tickerPresent.has(t.ticker),
-        actualPct: total > 0 ? ((tickerMap[t.ticker] || 0) / total) * 100 : 0,
+        actualPct: tickerPct[t.ticker] || 0,
       })),
     };
   });
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
+        <div className="space-y-4">
+          <div className="h-3 w-20 bg-slate-100 rounded animate-pulse" />
+          {[...Array(6)].map((_, i) => (
+            <div key={i} className="bg-slate-50 rounded-2xl p-5 space-y-3 animate-pulse">
+              <div className="flex justify-between"><div className="h-4 w-40 bg-slate-200 rounded" /><div className="h-4 w-10 bg-slate-200 rounded" /></div>
+              <div className="h-1.5 w-full bg-slate-200 rounded-full" />
+              <div className="space-y-2">{[...Array(3)].map((_, j) => <div key={j} className="h-3 w-full bg-slate-100 rounded" />)}</div>
+            </div>
+          ))}
+        </div>
+        <div className="space-y-4">
+          <div className="h-3 w-16 bg-slate-100 rounded animate-pulse" />
+          {[...Array(6)].map((_, i) => <div key={i} className="bg-slate-50 rounded-2xl p-5 h-28 animate-pulse" />)}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
@@ -226,16 +247,25 @@ export function SectorAllocation({ allAssets }: Props) {
   );
 }
 
-export function TickerAllocation({ allAssets }: Props) {
-  const total = allAssets.reduce((acc, a) => acc + getValue(a), 0);
-
-  const tickerMap: Record<string, number> = {};
+export function TickerAllocation({ allAssets, loading }: Props) {
+  const tickerPct: Record<string, number> = {};
   const tickerPresent = new Set<string>();
   allAssets.forEach((a) => {
     const key = normalizeTicker(a.ticker);
     tickerPresent.add(key);
-    tickerMap[key] = (tickerMap[key] || 0) + getValue(a);
+    tickerPct[key] = (tickerPct[key] || 0) + (a.portfolioPercent || 0);
   });
+
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
+        <div className="bg-slate-50 rounded-2xl h-96 animate-pulse" />
+        <div className="space-y-2">
+          {[...Array(21)].map((_, i) => <div key={i} className="h-8 bg-slate-50 rounded-xl animate-pulse" />)}
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
@@ -290,8 +320,7 @@ export function TickerAllocation({ allAssets }: Props) {
         </h3>
         <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-3">
           {EXPECTED_TICKERS.map((t) => {
-            const val = tickerMap[t.ticker] || 0;
-            const pct = total > 0 ? (val / total) * 100 : 0;
+            const pct = tickerPct[t.ticker] || 0;
             const diff = pct - t.target;
             const diffColor =
               Math.abs(diff) < 0.5
@@ -316,7 +345,7 @@ export function TickerAllocation({ allAssets }: Props) {
                       {diff.toFixed(1)}%
                     </span>
                     <span className="text-sm font-black text-[#111827] tabular-nums w-12 text-right">
-                      {pct > 0 ? pct.toFixed(1) + "%" : "—"}
+                      {tickerPresent.has(t.ticker) ? pct.toFixed(1) + "%" : "—"}
                     </span>
                   </div>
                 </div>
@@ -334,16 +363,7 @@ export function TickerAllocation({ allAssets }: Props) {
               Total tracked
             </span>
             <span className="text-sm font-black text-[#111827] tabular-nums">
-              {total > 0
-                ? (
-                    (EXPECTED_TICKERS.reduce(
-                      (acc, t) => acc + (tickerMap[t.ticker] || 0),
-                      0
-                    ) /
-                      total) *
-                    100
-                  ).toFixed(1) + "%"
-                : "—"}
+              {EXPECTED_TICKERS.reduce((acc, t) => acc + (tickerPct[t.ticker] || 0), 0).toFixed(1)}%
             </span>
           </div>
         </div>

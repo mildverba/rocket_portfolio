@@ -76,11 +76,11 @@ export function SectorAllocationPage({ assets: initialAssets }: Props) {
             </TabsList>
 
             <TabsContent value="sectors" className="m-0">
-              <SectorAllocation allAssets={allAssets} />
+              <SectorAllocation allAssets={allAssets} loading={loading} />
             </TabsContent>
 
             <TabsContent value="tickers" className="m-0">
-              <TickerAllocation allAssets={allAssets} />
+              <TickerAllocation allAssets={allAssets} loading={loading} />
             </TabsContent>
           </Tabs>
         </div>
