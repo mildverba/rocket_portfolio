@@ -104,18 +104,25 @@ interface Props {
 export function SectorAllocation({ allAssets }: Props) {
   const total = allAssets.reduce((acc, a) => acc + getValue(a), 0);
 
-  const sectorMap: Record<string, number> = {};
+  const tickerMap: Record<string, number> = {};
   allAssets.forEach((a) => {
-    const s = a.sector?.trim() || "Other";
-    sectorMap[s] = (sectorMap[s] || 0) + getValue(a);
+    tickerMap[a.ticker.toUpperCase()] = (tickerMap[a.ticker.toUpperCase()] || 0) + getValue(a);
   });
 
-  const actualSectors = Object.entries(sectorMap)
-    .sort((a, b) => b[1] - a[1])
-    .map(([name, value]) => ({
-      name,
-      pct: total > 0 ? (value / total) * 100 : 0,
-    }));
+  const actualSectors = EXPECTED_SECTORS.map((sector) => {
+    const sectorVal = sector.tickers.reduce(
+      (acc, t) => acc + (tickerMap[t.ticker] || 0),
+      0
+    );
+    return {
+      ...sector,
+      actualPct: total > 0 ? (sectorVal / total) * 100 : 0,
+      tickers: sector.tickers.map((t) => ({
+        ...t,
+        actualPct: total > 0 ? ((tickerMap[t.ticker] || 0) / total) * 100 : 0,
+      })),
+    };
+  });
 
   return (
     <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 items-start">
@@ -146,16 +153,11 @@ export function SectorAllocation({ allAssets }: Props) {
               </div>
               <div className="space-y-1.5 pl-1">
                 {sector.tickers.map((t) => (
-                  <div
-                    key={t.ticker}
-                    className="flex justify-between items-center text-xs"
-                  >
+                  <div key={t.ticker} className="flex justify-between items-center text-xs">
                     <span className="font-bold text-slate-700">
                       {t.ticker}
                       {t.desc && (
-                        <span className="font-normal text-slate-400 ml-1">
-                          — {t.desc}
-                        </span>
+                        <span className="font-normal text-slate-400 ml-1">— {t.desc}</span>
                       )}
                     </span>
                     <span className="font-bold text-slate-500">{t.target}%</span>
@@ -172,25 +174,67 @@ export function SectorAllocation({ allAssets }: Props) {
         <h3 className="text-[10px] font-black text-slate-400 tracking-widest uppercase">
           Actual
         </h3>
-        <div className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm space-y-5">
-          {actualSectors.map((s) => (
-            <div key={s.name}>
-              <div className="flex justify-between items-center mb-1.5">
-                <span className="text-sm font-extrabold text-[#111827] tracking-tight">
-                  {s.name}
-                </span>
-                <span className="text-sm font-black text-[#111827]">
-                  {s.pct.toFixed(1)}%
-                </span>
+        <div className="space-y-4">
+          {actualSectors.map((sector) => {
+            const diff = sector.actualPct - sector.target;
+            const diffColor =
+              Math.abs(diff) < 1 ? "text-slate-400" : diff > 0 ? "text-green-600" : "text-red-500";
+            return (
+              <div
+                key={sector.name}
+                className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm"
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <span className="font-black text-[#111827] text-sm tracking-tight">
+                    {sector.emoji} {sector.name}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className={`text-[10px] font-bold tabular-nums ${diffColor}`}>
+                      {diff > 0 ? "+" : ""}{diff.toFixed(1)}%
+                    </span>
+                    <span className="text-sm font-black text-[#111827]">
+                      {sector.actualPct.toFixed(1)}%
+                    </span>
+                  </div>
+                </div>
+                <div className="h-1.5 w-full bg-slate-100 rounded-full mb-3 overflow-hidden">
+                  <div
+                    className="h-full bg-blue-400 rounded-full transition-all duration-700"
+                    style={{ width: `${Math.min((sector.actualPct / BAR_SCALE) * 100, 100)}%` }}
+                  />
+                </div>
+                <div className="space-y-1.5 pl-1">
+                  {sector.tickers.map((t) => {
+                    const tDiff = t.actualPct - t.target;
+                    const tDiffColor =
+                      Math.abs(tDiff) < 0.5
+                        ? "text-slate-400"
+                        : tDiff > 0
+                        ? "text-green-600"
+                        : "text-red-500";
+                    return (
+                      <div key={t.ticker} className="flex justify-between items-center text-xs">
+                        <span className="font-bold text-slate-700">
+                          {t.ticker}
+                          {t.desc && (
+                            <span className="font-normal text-slate-400 ml-1">— {t.desc}</span>
+                          )}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className={`font-bold tabular-nums ${tDiffColor}`}>
+                            {tDiff > 0 ? "+" : ""}{tDiff.toFixed(1)}%
+                          </span>
+                          <span className="font-bold text-slate-600 w-10 text-right tabular-nums">
+                            {t.actualPct > 0 ? t.actualPct.toFixed(1) + "%" : "—"}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
-              <div className="h-2 w-full bg-slate-50 rounded-full overflow-hidden border border-slate-100/50">
-                <div
-                  className="h-full bg-blue-500 rounded-full transition-all duration-700"
-                  style={{ width: `${Math.min((s.pct / BAR_SCALE) * 100, 100)}%` }}
-                />
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
     </div>
