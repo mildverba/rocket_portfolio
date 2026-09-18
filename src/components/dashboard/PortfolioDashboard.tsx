@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { RefreshCw, TrendingUp, TrendingDown, Layers, Briefcase, FileSpreadsheet } from "lucide-react";
 import { Asset } from "@/lib/types";
-import { SectorAnalytics } from "./SectorAnalytics";
+import { SectorAllocation, TickerAllocation } from "./AllocationAnalysis";
 import { exportAssetsToExcel } from "@/lib/exportUtils";
 import { TradingViewChart } from "./TradingViewChart";
 import { MmfWidget } from "./MmfWidget";
@@ -18,17 +18,20 @@ import { fetchPortfolioData } from "@/actions/sheets";
 export function PortfolioDashboard({ 
   assets: initialAssets = [], 
   error: initialError, 
-  fetchTime: initialFetchTime 
+  fetchTime: initialFetchTime,
+  initialEurUsdRate = 1.10
 }: { 
   assets?: Asset[], 
   error?: string, 
-  fetchTime?: string 
+  fetchTime?: string,
+  initialEurUsdRate?: number
 }) {
   const [assets, setAssets] = useState<Asset[]>(initialAssets);
   const [activeTab, setActiveTab] = useState("stocks");
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [error, setError] = useState<string | undefined>(initialError);
   const [fetchTime, setFetchTime] = useState<string | undefined>(initialFetchTime);
+  const [eurUsdRate, setEurUsdRate] = useState<number>(initialEurUsdRate);
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -40,6 +43,7 @@ export function PortfolioDashboard({
       
       const freshAssets = sheetRes.assets;
       if (sheetRes.fetchTime) setFetchTime(sheetRes.fetchTime);
+      if (sheetRes.eurUsdRate) setEurUsdRate(sheetRes.eurUsdRate);
 
       // 2. Then fetch live prices for these fresh assets
       const response = await fetch("/api/prices", {
@@ -53,7 +57,8 @@ export function PortfolioDashboard({
         throw new Error(errorData.error || "Failed to fetch prices");
       }
 
-      const { updatedAssets } = await response.json();
+      const { updatedAssets, eurUsdRate: newRate } = await response.json();
+      if (newRate) setEurUsdRate(newRate);
       if (updatedAssets) {
         setAssets([...updatedAssets]);
       } else {
@@ -74,14 +79,14 @@ export function PortfolioDashboard({
     .filter(a => a.group === "Crypto")
     .sort((a, b) => (b.shares * b.currentPrice) - (a.shares * a.currentPrice));
 
-  const getEurUsdRate = (a: Asset) => (a.currentPriceUsd && a.currentPrice > 0) ? (a.currentPriceUsd / a.currentPrice) : 1.10;
+  const getEurUsdRate = (a: Asset) => (a.currentPriceUsd && a.currentPrice > 0) ? (a.currentPriceUsd / a.currentPrice) : eurUsdRate;
 
   const stocksTotal = stocks.reduce((acc, curr) => acc + (curr.shares * curr.currentPrice), 0);
   const cryptoTotal = crypto.reduce((acc, curr) => acc + (curr.shares * curr.currentPrice), 0);
   const portfolioTotal = stocksTotal + cryptoTotal;
 
-  const stocksTotalUsd = stocks.reduce((acc, curr) => acc + (curr.shares * (curr.currentPriceUsd || (curr.currentPrice * 1.10))), 0);
-  const cryptoTotalUsd = crypto.reduce((acc, curr) => acc + (curr.shares * (curr.currentPriceUsd || (curr.currentPrice * 1.10))), 0);
+  const stocksTotalUsd = stocks.reduce((acc, curr) => acc + (curr.shares * (curr.currentPriceUsd || (curr.currentPrice * eurUsdRate))), 0);
+  const cryptoTotalUsd = crypto.reduce((acc, curr) => acc + (curr.shares * (curr.currentPriceUsd || (curr.currentPrice * eurUsdRate))), 0);
   const portfolioTotalUsd = stocksTotalUsd + cryptoTotalUsd;
 
   const totalInvested = assets.reduce((acc, curr) => acc + (curr.shares * curr.avgPrice), 0);
@@ -356,11 +361,11 @@ return (
                 <tbody className="divide-y divide-slate-100">
                   {stocks.map((asset) => {
                     const value = asset.shares * asset.currentPrice;
-                    const eurUsdRate = (asset.currentPriceUsd && asset.currentPrice > 0) ? (asset.currentPriceUsd / asset.currentPrice) : 1.10;
-                    const avgPriceUsd = asset.avgPrice * eurUsdRate;
-                    const valueUsd = asset.shares * (asset.currentPriceUsd || (asset.currentPrice * 1.10));
+                    const itemEurUsdRate = (asset.currentPriceUsd && asset.currentPrice > 0) ? (asset.currentPriceUsd / asset.currentPrice) : eurUsdRate;
+                    const avgPriceUsd = asset.avgPrice * itemEurUsdRate;
+                    const valueUsd = asset.shares * (asset.currentPriceUsd || (asset.currentPrice * eurUsdRate));
                     const pnl = value - (asset.shares * asset.avgPrice);
-                    const pnlUsd = pnl * eurUsdRate;
+                    const pnlUsd = pnl * itemEurUsdRate;
                     const pnlPerc = asset.avgPrice > 0 ? (pnl / (asset.shares * asset.avgPrice)) * 100 : 0;
 
                     return (
@@ -449,11 +454,11 @@ return (
                     const pnl = value - (asset.shares * asset.avgPrice);
                     const pnlPerc = asset.avgPrice > 0 ? (pnl / (asset.shares * asset.avgPrice)) * 100 : 0;
                     
-                    const eurUsdRate = (asset.currentPriceUsd && asset.currentPrice > 0) ? (asset.currentPriceUsd / asset.currentPrice) : 1.10;
-                    const avgPriceUsd = asset.avgPrice * eurUsdRate;
-                    const currentPriceUsd = asset.currentPrice * eurUsdRate;
-                    const valueUsd = value * eurUsdRate;
-                    const pnlUsd = pnl * eurUsdRate;
+                    const itemEurUsdRate = (asset.currentPriceUsd && asset.currentPrice > 0) ? (asset.currentPriceUsd / asset.currentPrice) : eurUsdRate;
+                    const avgPriceUsd = asset.avgPrice * itemEurUsdRate;
+                    const currentPriceUsd = asset.currentPrice * itemEurUsdRate;
+                    const valueUsd = value * itemEurUsdRate;
+                    const pnlUsd = pnl * itemEurUsdRate;
 
                     return (
                       <tr key={asset.ticker} className="hover:bg-slate-50/40 transition-colors group">
@@ -517,18 +522,25 @@ return (
 
           <TabsContent value="analytics" className="m-0 p-0 overflow-visible bg-slate-50/10 rounded-b-2xl">
             <div className="p-4 md:p-6 lg:p-8">
-              <Tabs defaultValue="sector" className="flex flex-col gap-4 md:gap-6">
+              <Tabs defaultValue="sectors" className="flex flex-col gap-4 md:gap-6">
                 <TabsList className="bg-slate-100/80 p-1 h-9 md:h-11 rounded-xl w-fit">
-                  <TabsTrigger value="sector" className="text-[10px] md:text-sm font-extrabold px-3 md:px-6 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm rounded-lg transition-all tracking-tight">
-                    Sector Overview
+                  <TabsTrigger value="sectors" className="text-[10px] md:text-sm font-extrabold px-3 md:px-6 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm rounded-lg transition-all tracking-tight">
+                    Сектора портфеля
+                  </TabsTrigger>
+                  <TabsTrigger value="tickers" className="text-[10px] md:text-sm font-extrabold px-3 md:px-6 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm rounded-lg transition-all tracking-tight">
+                    По каждой акции
                   </TabsTrigger>
                   <TabsTrigger value="charts" className="text-[10px] md:text-sm font-extrabold px-3 md:px-6 data-[state=active]:bg-white data-[state=active]:text-purple-600 data-[state=active]:shadow-sm rounded-lg transition-all tracking-tight">
                     Charts
                   </TabsTrigger>
                 </TabsList>
-                
-                <TabsContent value="sector" className="m-0 bg-white min-h-[400px] rounded-3xl p-6 lg:p-8 shadow-sm border border-slate-100">
-                  <SectorAnalytics stocks={stocks} crypto={crypto} />
+
+                <TabsContent value="sectors" className="m-0 bg-white min-h-[400px] rounded-3xl p-6 lg:p-8 shadow-sm border border-slate-100">
+                  <SectorAllocation allAssets={[...stocks, ...crypto]} />
+                </TabsContent>
+
+                <TabsContent value="tickers" className="m-0 bg-white min-h-[400px] rounded-3xl p-6 lg:p-8 shadow-sm border border-slate-100">
+                  <TickerAllocation allAssets={[...stocks, ...crypto]} />
                 </TabsContent>
                 
                 <TabsContent value="charts" className="m-0 bg-white min-h-[400px] rounded-3xl p-6 lg:p-8 shadow-sm border border-slate-100 flex flex-col space-y-6">
