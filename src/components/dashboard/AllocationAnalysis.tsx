@@ -106,13 +106,16 @@ interface Props {
 }
 
 export function SectorAllocation({ allAssets, loading }: Props) {
-  // Use portfolioPercent from the prices API — already converted to EUR and summed
+  const stocks = allAssets.filter((a) => a.group !== "Crypto");
+  const stocksTotal = stocks.reduce((acc, a) => acc + a.shares * (a.currentPrice || 0), 0);
+
   const tickerPct: Record<string, number> = {};
   const tickerPresent = new Set<string>();
-  allAssets.forEach((a) => {
+  stocks.forEach((a) => {
     const key = normalizeTicker(a.ticker);
     tickerPresent.add(key);
-    tickerPct[key] = (tickerPct[key] || 0) + (a.portfolioPercent || 0);
+    const pct = stocksTotal > 0 ? (a.shares * (a.currentPrice || 0) / stocksTotal) * 100 : 0;
+    tickerPct[key] = (tickerPct[key] || 0) + pct;
   });
 
   const actualSectors = EXPECTED_SECTORS.map((sector) => {
@@ -248,12 +251,16 @@ export function SectorAllocation({ allAssets, loading }: Props) {
 }
 
 export function TickerAllocation({ allAssets, loading }: Props) {
+  const stocks = allAssets.filter((a) => a.group !== "Crypto");
+  const stocksTotal = stocks.reduce((acc, a) => acc + a.shares * (a.currentPrice || 0), 0);
+
   const tickerPct: Record<string, number> = {};
   const tickerPresent = new Set<string>();
-  allAssets.forEach((a) => {
+  stocks.forEach((a) => {
     const key = normalizeTicker(a.ticker);
     tickerPresent.add(key);
-    tickerPct[key] = (tickerPct[key] || 0) + (a.portfolioPercent || 0);
+    const pct = stocksTotal > 0 ? (a.shares * (a.currentPrice || 0) / stocksTotal) * 100 : 0;
+    tickerPct[key] = (tickerPct[key] || 0) + pct;
   });
 
   if (loading) {
