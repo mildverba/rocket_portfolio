@@ -97,6 +97,9 @@ const getValue = (asset: Asset) => {
   return (asset.shares || 0) * (price || 0);
 };
 
+// Strip exchange suffix: "IWDA.L" → "IWDA", "EMIM.AS" → "EMIM"
+const normalizeTicker = (ticker: string) => ticker.split(".")[0].toUpperCase();
+
 interface Props {
   allAssets: Asset[];
 }
@@ -106,7 +109,8 @@ export function SectorAllocation({ allAssets }: Props) {
 
   const tickerMap: Record<string, number> = {};
   allAssets.forEach((a) => {
-    tickerMap[a.ticker.toUpperCase()] = (tickerMap[a.ticker.toUpperCase()] || 0) + getValue(a);
+    const key = normalizeTicker(a.ticker);
+    tickerMap[key] = (tickerMap[key] || 0) + getValue(a);
   });
 
   const actualSectors = EXPECTED_SECTORS.map((sector) => {
@@ -175,66 +179,42 @@ export function SectorAllocation({ allAssets }: Props) {
           Actual
         </h3>
         <div className="space-y-4">
-          {actualSectors.map((sector) => {
-            const diff = sector.actualPct - sector.target;
-            const diffColor =
-              Math.abs(diff) < 1 ? "text-slate-400" : diff > 0 ? "text-green-600" : "text-red-500";
-            return (
-              <div
-                key={sector.name}
-                className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm"
-              >
-                <div className="flex items-center justify-between mb-2">
-                  <span className="font-black text-[#111827] text-sm tracking-tight">
-                    {sector.emoji} {sector.name}
-                  </span>
-                  <div className="flex items-center gap-2">
-                    <span className={`text-[10px] font-bold tabular-nums ${diffColor}`}>
-                      {diff > 0 ? "+" : ""}{diff.toFixed(1)}%
+          {actualSectors.map((sector) => (
+            <div
+              key={sector.name}
+              className="bg-white rounded-2xl border border-slate-100 p-5 shadow-sm"
+            >
+              <div className="flex items-center justify-between mb-2">
+                <span className="font-black text-[#111827] text-sm tracking-tight">
+                  {sector.emoji} {sector.name}
+                </span>
+                <span className="text-sm font-black text-[#111827]">
+                  {sector.actualPct > 0 ? sector.actualPct.toFixed(1) + "%" : "—"}
+                </span>
+              </div>
+              <div className="h-1.5 w-full bg-slate-100 rounded-full mb-3 overflow-hidden">
+                <div
+                  className="h-full bg-blue-400 rounded-full transition-all duration-700"
+                  style={{ width: `${Math.min((sector.actualPct / BAR_SCALE) * 100, 100)}%` }}
+                />
+              </div>
+              <div className="space-y-1.5 pl-1">
+                {sector.tickers.map((t) => (
+                  <div key={t.ticker} className="flex justify-between items-center text-xs">
+                    <span className="font-bold text-slate-700">
+                      {t.ticker}
+                      {t.desc && (
+                        <span className="font-normal text-slate-400 ml-1">— {t.desc}</span>
+                      )}
                     </span>
-                    <span className="text-sm font-black text-[#111827]">
-                      {sector.actualPct.toFixed(1)}%
+                    <span className="font-bold text-slate-600 w-10 text-right tabular-nums">
+                      {t.actualPct > 0 ? t.actualPct.toFixed(1) + "%" : "—"}
                     </span>
                   </div>
-                </div>
-                <div className="h-1.5 w-full bg-slate-100 rounded-full mb-3 overflow-hidden">
-                  <div
-                    className="h-full bg-blue-400 rounded-full transition-all duration-700"
-                    style={{ width: `${Math.min((sector.actualPct / BAR_SCALE) * 100, 100)}%` }}
-                  />
-                </div>
-                <div className="space-y-1.5 pl-1">
-                  {sector.tickers.map((t) => {
-                    const tDiff = t.actualPct - t.target;
-                    const tDiffColor =
-                      Math.abs(tDiff) < 0.5
-                        ? "text-slate-400"
-                        : tDiff > 0
-                        ? "text-green-600"
-                        : "text-red-500";
-                    return (
-                      <div key={t.ticker} className="flex justify-between items-center text-xs">
-                        <span className="font-bold text-slate-700">
-                          {t.ticker}
-                          {t.desc && (
-                            <span className="font-normal text-slate-400 ml-1">— {t.desc}</span>
-                          )}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          <span className={`font-bold tabular-nums ${tDiffColor}`}>
-                            {tDiff > 0 ? "+" : ""}{tDiff.toFixed(1)}%
-                          </span>
-                          <span className="font-bold text-slate-600 w-10 text-right tabular-nums">
-                            {t.actualPct > 0 ? t.actualPct.toFixed(1) + "%" : "—"}
-                          </span>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
+                ))}
               </div>
-            );
-          })}
+            </div>
+          ))}
         </div>
       </div>
     </div>
@@ -246,7 +226,7 @@ export function TickerAllocation({ allAssets }: Props) {
 
   const tickerMap: Record<string, number> = {};
   allAssets.forEach((a) => {
-    const key = a.ticker.toUpperCase();
+    const key = normalizeTicker(a.ticker);
     tickerMap[key] = (tickerMap[key] || 0) + getValue(a);
   });
 
