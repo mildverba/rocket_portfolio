@@ -108,8 +108,10 @@ export function SectorAllocation({ allAssets }: Props) {
   const total = allAssets.reduce((acc, a) => acc + getValue(a), 0);
 
   const tickerMap: Record<string, number> = {};
+  const tickerPresent = new Set<string>();
   allAssets.forEach((a) => {
     const key = normalizeTicker(a.ticker);
+    tickerPresent.add(key);
     tickerMap[key] = (tickerMap[key] || 0) + getValue(a);
   });
 
@@ -118,11 +120,14 @@ export function SectorAllocation({ allAssets }: Props) {
       (acc, t) => acc + (tickerMap[t.ticker] || 0),
       0
     );
+    const sectorPresent = sector.tickers.some((t) => tickerPresent.has(t.ticker));
     return {
       ...sector,
       actualPct: total > 0 ? (sectorVal / total) * 100 : 0,
+      sectorPresent,
       tickers: sector.tickers.map((t) => ({
         ...t,
+        inPortfolio: tickerPresent.has(t.ticker),
         actualPct: total > 0 ? ((tickerMap[t.ticker] || 0) / total) * 100 : 0,
       })),
     };
@@ -189,7 +194,7 @@ export function SectorAllocation({ allAssets }: Props) {
                   {sector.emoji} {sector.name}
                 </span>
                 <span className="text-sm font-black text-[#111827]">
-                  {sector.actualPct > 0 ? sector.actualPct.toFixed(1) + "%" : "—"}
+                  {sector.sectorPresent ? sector.actualPct.toFixed(1) + "%" : "—"}
                 </span>
               </div>
               <div className="h-1.5 w-full bg-slate-100 rounded-full mb-3 overflow-hidden">
@@ -207,8 +212,8 @@ export function SectorAllocation({ allAssets }: Props) {
                         <span className="font-normal text-slate-400 ml-1">— {t.desc}</span>
                       )}
                     </span>
-                    <span className="font-bold text-slate-600 w-10 text-right tabular-nums">
-                      {t.actualPct > 0 ? t.actualPct.toFixed(1) + "%" : "—"}
+                    <span className={`font-bold w-10 text-right tabular-nums ${t.inPortfolio ? "text-slate-600" : "text-slate-300"}`}>
+                      {t.inPortfolio ? t.actualPct.toFixed(1) + "%" : "—"}
                     </span>
                   </div>
                 ))}
@@ -225,8 +230,10 @@ export function TickerAllocation({ allAssets }: Props) {
   const total = allAssets.reduce((acc, a) => acc + getValue(a), 0);
 
   const tickerMap: Record<string, number> = {};
+  const tickerPresent = new Set<string>();
   allAssets.forEach((a) => {
     const key = normalizeTicker(a.ticker);
+    tickerPresent.add(key);
     tickerMap[key] = (tickerMap[key] || 0) + getValue(a);
   });
 
