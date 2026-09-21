@@ -10,7 +10,6 @@ const EXPECTED_SECTORS = [
     tickers: [
       { ticker: "IWDA", desc: "развитые рынки мира", target: 32 },
       { ticker: "EMIM", desc: "emerging markets", target: 5 },
-      { ticker: "SPYD", desc: "dividend equities — продаём", target: 0 },
     ],
   },
   {
@@ -18,13 +17,11 @@ const EXPECTED_SECTORS = [
     name: "Technology / Growth / Fintech",
     target: 27,
     tickers: [
-      { ticker: "AMZN", desc: "", target: 9 },
+      { ticker: "AMZN", desc: "", target: 10.5 },
       { ticker: "GEN", desc: "", target: 7 },
       { ticker: "PLTR", desc: "", target: 5 },
       { ticker: "SOFI", desc: "", target: 3 },
-      { ticker: "OSPN", desc: "", target: 1 },
-      { ticker: "VTEX", desc: "", target: 0.5 },
-      { ticker: "IEVD", desc: "EV/innovation ETF", target: 1.5 },
+      { ticker: "IEVD", desc: "electro cars", target: 1.5 },
     ],
   },
   {
@@ -56,7 +53,7 @@ const EXPECTED_SECTORS = [
     tickers: [
       { ticker: "AGGH", desc: "global bonds", target: 3 },
       { ticker: "US Treasury 1–3Y EUR Hedged", desc: "", target: 3 },
-      { ticker: "XEON", desc: "cash-like EUR", target: 4 },
+      { ticker: "XEON", desc: "cash-like EUR (money-market)", target: 4 },
     ],
   },
   {
@@ -64,8 +61,8 @@ const EXPECTED_SECTORS = [
     name: "Crypto / high-beta",
     target: 5,
     tickers: [
-      { ticker: "BMNR", desc: "", target: 2.5 },
-      { ticker: "BTDR", desc: "", target: 2.5 },
+      { ticker: "BMNR", desc: "Bitmine (ETH)", target: 2.5 },
+      { ticker: "BTDR", desc: "Bitcoin mining+AI Cloud+Data Centers", target: 2.5 },
     ],
   },
 ];
@@ -73,14 +70,11 @@ const EXPECTED_SECTORS = [
 const EXPECTED_TICKERS = [
   { ticker: "IWDA", desc: "MSCI World", target: 32 },
   { ticker: "EMIM", desc: "Emerging Markets", target: 5 },
-  { ticker: "SPYD", desc: "Dividend equities — продаём", target: 0 },
-  { ticker: "AMZN", desc: "Amazon", target: 9 },
+  { ticker: "AMZN", desc: "Amazon", target: 10.5 },
   { ticker: "GEN", desc: "Gen Digital", target: 7 },
   { ticker: "PLTR", desc: "Palantir", target: 5 },
   { ticker: "SOFI", desc: "SoFi", target: 3 },
-  { ticker: "OSPN", desc: "OneSpan", target: 1 },
-  { ticker: "VTEX", desc: "VTEX", target: 0.5 },
-  { ticker: "IEVD", desc: "EV thematic ETF", target: 1.5 },
+  { ticker: "IEVD", desc: "electro cars", target: 1.5 },
   { ticker: "VST", desc: "Vistra / electricity", target: 4 },
   { ticker: "VIST", desc: "Vista Energy", target: 3 },
   { ticker: "XE", desc: "X-energy", target: 2 },
@@ -91,9 +85,9 @@ const EXPECTED_TICKERS = [
   { ticker: "SILG", desc: "Silver miners", target: 0.5 },
   { ticker: "AGGH", desc: "Global bonds", target: 3 },
   { ticker: "US Treasury 1–3Y EUR Hedged", desc: "", target: 3 },
-  { ticker: "XEON", desc: "Cash-like EUR", target: 4 },
-  { ticker: "BMNR", desc: "BitMine", target: 2.5 },
-  { ticker: "BTDR", desc: "Bitdeer", target: 2.5 },
+  { ticker: "XEON", desc: "cash-like EUR (money-market)", target: 4 },
+  { ticker: "BMNR", desc: "Bitmine (ETH)", target: 2.5 },
+  { ticker: "BTDR", desc: "Bitcoin mining+AI Cloud+Data Centers", target: 2.5 },
 ];
 
 const BAR_SCALE = 35;
