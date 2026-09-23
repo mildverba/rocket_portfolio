@@ -117,8 +117,8 @@ export async function POST(req: NextRequest) {
 
         const cmcQuote = cmcData && cmcData[baseTicker];
 
-        if (cmcQuote && cmcQuote.quote && cmcQuote.quote.USD) {
-          const priceUsd = cmcQuote.quote.USD.price;
+        if (cmcQuote && cmcQuote.quote && cmcQuote.quote.USD && cmcQuote.quote.USD.price != null) {
+          const priceUsd = cmcQuote.quote.USD.price as number;
           asset.currentPrice = priceUsd / eurUsdRate;
           asset.priceSource = 'api';
           console.log(`[API] CMC SUCCESS: ${baseTicker} = $${priceUsd.toFixed(4)}`);
