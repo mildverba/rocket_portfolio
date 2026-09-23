@@ -13,6 +13,9 @@ function mapTickerToYahoo(ticker: string): string {
   if (t === "SILVER" || t === "SSLN" || t === "SSLN.L") return "SSLN.L";
   if (t === "EMIM") return "EMIM.DE";
   if (t === "SOFI") return "SOFI";
+  if (t === "XEON") return "XEON.DE";
+  if (t === "IBTE") return "IBTE.DE";
+  if (t === "URNU") return "URNU.AS";
   
   if (ticker.includes(":XETR")) return ticker.replace(":XETR", ".DE");
   if (ticker.includes(":PAR")) return ticker.replace(":PAR", ".PA");
