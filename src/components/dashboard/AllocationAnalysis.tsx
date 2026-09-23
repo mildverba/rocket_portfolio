@@ -52,7 +52,7 @@ const EXPECTED_SECTORS = [
     target: 10,
     tickers: [
       { ticker: "AGGH", desc: "global bonds", target: 3 },
-      { ticker: "US Treasury 1–3Y EUR Hedged", desc: "", target: 3 },
+      { ticker: "IBTE", desc: "", target: 3 },
       { ticker: "XEON", desc: "cash-like EUR (money-market)", target: 4 },
     ],
   },
@@ -84,7 +84,7 @@ const EXPECTED_TICKERS = [
   { ticker: "ISLNL", desc: "Physical silver", target: 1.5 },
   { ticker: "SILG", desc: "Silver miners", target: 0.5 },
   { ticker: "AGGH", desc: "Global bonds", target: 3 },
-  { ticker: "US Treasury 1–3Y EUR Hedged", desc: "", target: 3 },
+  { ticker: "IBTE", desc: "", target: 3 },
   { ticker: "XEON", desc: "cash-like EUR (money-market)", target: 4 },
   { ticker: "BMNR", desc: "Bitmine (ETH)", target: 2.5 },
   { ticker: "BTDR", desc: "Bitcoin mining+AI Cloud+Data Centers", target: 2.5 },
@@ -98,8 +98,8 @@ const getValue = (asset: Asset) => {
   return (asset.shares || 0) * (price || 0);
 };
 
-// Strip exchange suffix: "IWDA.L" → "IWDA", "EMIM.AS" → "EMIM"
-const normalizeTicker = (ticker: string) => ticker.split(".")[0].toUpperCase();
+// Strip exchange suffix: "IWDA.L" → "IWDA", "XEON:XETR" → "XEON"
+const normalizeTicker = (ticker: string) => ticker.split(".")[0].split(":")[0].toUpperCase();
 
 const CRYPTO_COLORS = ["#A855F7", "#6366f1", "#0ea5e9", "#10b981", "#f59e0b", "#f43f5e", "#8b5cf6", "#3b82f6", "#ec4899", "#14b8a6"];
 
