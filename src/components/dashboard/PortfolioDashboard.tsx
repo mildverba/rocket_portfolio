@@ -33,6 +33,20 @@ export function PortfolioDashboard({
   const [fetchTime, setFetchTime] = useState<string | undefined>(initialFetchTime);
   const [eurUsdRate, setEurUsdRate] = useState<number>(initialEurUsdRate);
 
+  const safeNum = (v: unknown, fallback = 0): number =>
+    typeof v === "number" && isFinite(v) ? v : fallback;
+
+  // After JSON round-trip NaN/Infinity become null — sanitise all numeric fields
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sanitizeAssets = (raw: any[]): Asset[] =>
+    raw.map(a => ({
+      ...a,
+      shares: safeNum(a.shares),
+      avgPrice: safeNum(a.avgPrice),
+      currentPrice: safeNum(a.currentPrice),
+      portfolioPercent: safeNum(a.portfolioPercent),
+    }));
+
   const handleRefresh = async () => {
     setIsRefreshing(true);
     setError(undefined);
@@ -40,7 +54,7 @@ export function PortfolioDashboard({
       // 1. Fetch fresh data from Google Sheets first
       const sheetRes = await fetchPortfolioData();
       if (sheetRes.error) throw new Error(sheetRes.error);
-      
+
       const freshAssets = sheetRes.assets;
       if (sheetRes.fetchTime) setFetchTime(sheetRes.fetchTime);
       if (sheetRes.eurUsdRate) setEurUsdRate(sheetRes.eurUsdRate);
@@ -60,9 +74,9 @@ export function PortfolioDashboard({
       const { updatedAssets, eurUsdRate: newRate } = await response.json();
       if (newRate) setEurUsdRate(newRate);
       if (updatedAssets) {
-        setAssets([...updatedAssets]);
+        setAssets(sanitizeAssets(updatedAssets));
       } else {
-        setAssets([...freshAssets]);
+        setAssets(sanitizeAssets(freshAssets));
       }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Failed to fetch live prices.");
