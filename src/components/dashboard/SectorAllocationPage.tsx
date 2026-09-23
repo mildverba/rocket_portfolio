@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { Asset } from "@/lib/types";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { SectorAllocation, CryptoAllocation } from "./AllocationAnalysis";
+import { SectorAllocation, CryptoAllocation, AllocationRationale } from "./AllocationAnalysis";
 import { RefreshCw } from "lucide-react";
 
 interface Props {
@@ -95,6 +95,8 @@ export function SectorAllocationPage({ assets: initialAssets }: Props) {
             </TabsContent>
           </Tabs>
         </div>
+
+        <AllocationRationale />
       </div>
     </div>
   );

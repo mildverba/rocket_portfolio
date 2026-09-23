@@ -474,3 +474,49 @@ export function TickerAllocation({ allAssets, loading }: Props) {
     </div>
   );
 }
+
+export function AllocationRationale() {
+  return (
+    <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-6 md:p-8">
+      <h2 className="text-xl font-black text-[#111827] tracking-tight mb-6">
+        Логика аллокации
+      </h2>
+      <div className="overflow-x-auto">
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="bg-slate-50 border-b border-slate-100">
+              <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">Блок</th>
+              <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">Актив</th>
+              <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">Вес</th>
+              <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">Зачем нужен</th>
+              <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">Основной риск</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-slate-50">
+            {EXPECTED_SECTORS.map((sector) =>
+              sector.tickers.map((t, i) => (
+                <tr key={`${sector.name}-${t.ticker}`} className="hover:bg-slate-50/40 transition-colors">
+                  {i === 0 && (
+                    <td
+                      rowSpan={sector.tickers.length}
+                      className="px-4 py-3 align-top border-r border-slate-100"
+                    >
+                      <div className="font-black text-[#111827] text-xs whitespace-nowrap">
+                        {sector.emoji} {sector.name}
+                      </div>
+                      <div className="font-bold text-purple-500 text-[11px] mt-0.5">{sector.target}%</div>
+                    </td>
+                  )}
+                  <td className="px-4 py-3 font-extrabold text-[#111827] whitespace-nowrap">{t.ticker}</td>
+                  <td className="px-4 py-3 text-right font-black text-purple-600 whitespace-nowrap tabular-nums">{t.target}%</td>
+                  <td className="px-4 py-3 text-slate-600 text-xs leading-relaxed">{t.why}</td>
+                  <td className="px-4 py-3 text-slate-400 text-xs leading-relaxed">{t.risk}</td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
