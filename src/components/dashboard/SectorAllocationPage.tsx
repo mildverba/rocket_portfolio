@@ -14,6 +14,16 @@ export function SectorAllocationPage({ assets: initialAssets }: Props) {
   const [assets, setAssets] = useState<Asset[]>(initialAssets);
   const [loading, setLoading] = useState(true);
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const sanitize = (raw: any[]): Asset[] =>
+    raw.map((a) => ({
+      ...a,
+      shares: typeof a.shares === "number" && isFinite(a.shares) ? a.shares : 0,
+      avgPrice: typeof a.avgPrice === "number" && isFinite(a.avgPrice) ? a.avgPrice : 0,
+      currentPrice: typeof a.currentPrice === "number" && isFinite(a.currentPrice) ? a.currentPrice : 0,
+      portfolioPercent: typeof a.portfolioPercent === "number" && isFinite(a.portfolioPercent) ? a.portfolioPercent : 0,
+    }));
+
   useEffect(() => {
     const fetchPrices = async () => {
       try {
@@ -24,7 +34,7 @@ export function SectorAllocationPage({ assets: initialAssets }: Props) {
         });
         if (!res.ok) return;
         const { updatedAssets } = await res.json();
-        if (updatedAssets) setAssets(updatedAssets);
+        if (updatedAssets) setAssets(sanitize(updatedAssets));
       } catch {
         // fall back to sheet data
       } finally {
@@ -32,7 +42,8 @@ export function SectorAllocationPage({ assets: initialAssets }: Props) {
       }
     };
     fetchPrices();
-  }, [initialAssets]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const stocks = assets.filter((a) => a.group !== "Crypto");
   const crypto = assets.filter((a) => a.group === "Crypto");
