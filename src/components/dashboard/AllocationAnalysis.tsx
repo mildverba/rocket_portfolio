@@ -8,8 +8,8 @@ const EXPECTED_SECTORS = [
     name: "Core ETF",
     target: 37,
     tickers: [
-      { ticker: "IWDA", desc: "развитые рынки мира", target: 32 },
-      { ticker: "EMIM", desc: "emerging markets", target: 5 },
+      { ticker: "IWDA", desc: "развитые рынки мира", target: 32, why: "Главная база портфеля, глобальные developed markets", risk: "США/mega-cap tech занимают большую долю" },
+      { ticker: "EMIM", desc: "emerging markets", target: 5, why: "Добавляет emerging markets, которых мало/нет в IWDA", risk: "Китай, валюты EM, политика" },
     ],
   },
   {
@@ -17,23 +17,24 @@ const EXPECTED_SECTORS = [
     name: "Technology / Growth / Fintech",
     target: 27,
     tickers: [
-      { ticker: "AMZN", desc: "", target: 10.5 },
-      { ticker: "GEN", desc: "", target: 7 },
-      { ticker: "PLTR", desc: "", target: 5 },
-      { ticker: "SOFI", desc: "", target: 3 },
-      { ticker: "IEVD", desc: "electro cars", target: 1.5 },
+      { ticker: "AMZN", desc: "", target: 10.5, why: "AWS, AI, cloud, e-commerce; крупная quality-growth позиция", risk: "Высокий CAPEX, valuation, tech-cycle" },
+      { ticker: "GEN", desc: "", target: 7, why: "Cybersecurity / consumer security, cash-flow business", risk: "Концентрация в одной компании" },
+      { ticker: "PLTR", desc: "", target: 5, why: "Прямая ставка на AI software/data platforms", risk: "Высокая оценка и волатильность" },
+      { ticker: "SOFI", desc: "", target: 3, why: "Fintech / digital banking growth", risk: "Кредитный цикл, ставки, конкуренция" },
+      { ticker: "IEVD", desc: "electro cars", target: 1.5, why: "Отдельная ставка на EV/electrification", risk: "Узкая theme, цикличность авто" },
     ],
   },
   {
     emoji: "⚡",
-    name: "Energy / Nuclear / Infrastructure",
+    name: "AI Infra / Energy / Nuclear",
     target: 15,
     tickers: [
-      { ticker: "VST", desc: "electricity / power generation", target: 4 },
-      { ticker: "VIST", desc: "oil & gas", target: 3 },
-      { ticker: "XE", desc: "nuclear / SMR", target: 2 },
-      { ticker: "URNU", desc: "uranium/nuclear ETF", target: 3.5 },
-      { ticker: "INFR", desc: "infrastructure ETF", target: 2.5 },
+      { ticker: "VST", desc: "electricity / power generation", target: 4, why: "Электроэнергия для data centers/AI, генерация", risk: "Power prices, regulation" },
+      { ticker: "URNU", desc: "uranium/nuclear ETF", target: 2.5, why: "Широкая ставка на uranium/nuclear supply chain", risk: "Очень цикличный сектор" },
+      { ticker: "CBUX", desc: "infrastructure ETF", target: 2.5, why: "Электросети, pipelines, transport, utilities — диверсифицирует energy-блок", risk: "Всё ещё equity, может падать с рынком" },
+      { ticker: "XE", desc: "nuclear / SMR", target: 2, why: "Более спекулятивная ставка на advanced nuclear / SMR", risk: "Execution, funding, dilution" },
+      { ticker: "VIST", desc: "oil & gas", target: 2, why: "Oil & gas; другой источник прибыли, чем tech/AI", risk: "Нефть, Argentina" },
+      { ticker: "SEC0", desc: "semiconductors ETF", target: 2, why: "Semiconductor layer AI: chips, fabs, equipment", risk: "Сильная цикличность, частично уже есть в IWDA" },
     ],
   },
   {
@@ -41,9 +42,9 @@ const EXPECTED_SECTORS = [
     name: "Commodities / Metals",
     target: 6,
     tickers: [
-      { ticker: "COPX", desc: "copper miners", target: 4 },
-      { ticker: "ISLNL", desc: "silver exposure", target: 1.5 },
-      { ticker: "SILG", desc: "silver miners", target: 0.5 },
+      { ticker: "COPX", desc: "copper miners", target: 4, why: "Долгосрочная ставка на дефицит меди/electrification", risk: "Mining-cycle, copper price" },
+      { ticker: "ISLNL", desc: "silver exposure", target: 1.5, why: "Прямая exposure к серебру", risk: "Очень волатильный металл" },
+      { ticker: "SILG", desc: "silver miners", target: 0.5, why: "Более leveraged ставка на серебро через miners", risk: "Риск компаний + серебра одновременно" },
     ],
   },
   {
@@ -51,44 +52,25 @@ const EXPECTED_SECTORS = [
     name: "Bonds + Cash-like",
     target: 10,
     tickers: [
-      { ticker: "AGGH", desc: "global bonds", target: 3 },
-      { ticker: "IBTE", desc: "", target: 3 },
-      { ticker: "XEON", desc: "cash-like EUR (money-market)", target: 4 },
+      { ticker: "AGGH", desc: "global bonds", target: 3, why: "Глобальный bond stabilizer, более длинная duration", risk: "Может падать при росте ставок" },
+      { ticker: "IBTE", desc: "US Treasuries 1–3Y EUR Hedged", target: 3, why: "Короткие US Treasuries, меньше duration risk", risk: "Доходность снизится при снижении ставок" },
+      { ticker: "XEON", desc: "cash-like EUR (money-market)", target: 4, why: "Почти cash: резерв для коррекций и ребалансировки", risk: "Низкий expected return при низких ставках" },
     ],
   },
   {
     emoji: "₿",
-    name: "Crypto / high-beta",
+    name: "Crypto / High-beta",
     target: 5,
     tickers: [
-      { ticker: "BMNR", desc: "Bitmine (ETH)", target: 2.5 },
-      { ticker: "BTDR", desc: "Bitcoin mining+AI Cloud+Data Centers", target: 2.5 },
+      { ticker: "BMNR", desc: "Bitmine (ETH)", target: 2.5, why: "ETH-related high-beta exposure", risk: "Очень высокая волатильность" },
+      { ticker: "BTDR", desc: "Bitcoin mining+AI Cloud+Data Centers", target: 2.5, why: "BTC mining + AI/cloud/data centers", risk: "BTC-cycle, CAPEX, execution" },
     ],
   },
 ];
 
-const EXPECTED_TICKERS = [
-  { ticker: "IWDA", desc: "MSCI World", target: 32 },
-  { ticker: "EMIM", desc: "Emerging Markets", target: 5 },
-  { ticker: "AMZN", desc: "Amazon", target: 10.5 },
-  { ticker: "GEN", desc: "Gen Digital", target: 7 },
-  { ticker: "PLTR", desc: "Palantir", target: 5 },
-  { ticker: "SOFI", desc: "SoFi", target: 3 },
-  { ticker: "IEVD", desc: "electro cars", target: 1.5 },
-  { ticker: "VST", desc: "Vistra / electricity", target: 4 },
-  { ticker: "VIST", desc: "Vista Energy", target: 3 },
-  { ticker: "XE", desc: "X-energy", target: 2 },
-  { ticker: "URNU", desc: "Uranium ETF", target: 3.5 },
-  { ticker: "INFR", desc: "Infrastructure ETF", target: 2.5 },
-  { ticker: "COPX", desc: "Copper miners ETF", target: 4 },
-  { ticker: "ISLNL", desc: "Physical silver", target: 1.5 },
-  { ticker: "SILG", desc: "Silver miners", target: 0.5 },
-  { ticker: "AGGH", desc: "Global bonds", target: 3 },
-  { ticker: "IBTE", desc: "", target: 3 },
-  { ticker: "XEON", desc: "cash-like EUR (money-market)", target: 4 },
-  { ticker: "BMNR", desc: "Bitmine (ETH)", target: 2.5 },
-  { ticker: "BTDR", desc: "Bitcoin mining+AI Cloud+Data Centers", target: 2.5 },
-];
+const EXPECTED_TICKERS = EXPECTED_SECTORS.flatMap((s) =>
+  s.tickers.map((t) => ({ ticker: t.ticker, desc: t.desc, target: t.target }))
+);
 
 const BAR_SCALE = 35;
 const CRYPTO_BAR_SCALE = 40;
@@ -378,39 +360,56 @@ export function TickerAllocation({ allAssets, loading }: Props) {
         <h3 className="text-[10px] font-black text-slate-400 tracking-widest uppercase">
           Expected
         </h3>
-        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-2xl border border-slate-100 shadow-sm overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
               <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  Тикер
+                <th className="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">
+                  Блок
                 </th>
-                <th className="px-4 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  Что это
+                <th className="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Актив
                 </th>
-                <th className="px-4 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-400">
-                  Цель
+                <th className="px-3 py-3 text-right text-[10px] font-black uppercase tracking-widest text-slate-400 whitespace-nowrap">
+                  Вес
+                </th>
+                <th className="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Зачем нужен
+                </th>
+                <th className="px-3 py-3 text-left text-[10px] font-black uppercase tracking-widest text-slate-400">
+                  Основной риск
                 </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
-              {EXPECTED_TICKERS.map((t) => (
-                <tr key={t.ticker} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="px-4 py-2.5 font-extrabold text-[#111827]">{t.ticker}</td>
-                  <td className="px-4 py-2.5 text-slate-500 font-medium">{t.desc}</td>
-                  <td className="px-4 py-2.5 text-right font-black text-purple-600">
-                    {t.target}%
-                  </td>
-                </tr>
-              ))}
+              {EXPECTED_SECTORS.map((sector) =>
+                sector.tickers.map((t, i) => (
+                  <tr key={`${sector.name}-${t.ticker}`} className="hover:bg-slate-50/50 transition-colors">
+                    {i === 0 && (
+                      <td
+                        rowSpan={sector.tickers.length}
+                        className="px-3 py-2.5 font-black text-[#111827] text-xs align-top border-r border-slate-100 whitespace-nowrap"
+                      >
+                        {sector.emoji} {sector.name}
+                        <div className="font-bold text-purple-600 text-[11px] mt-0.5">{sector.target}%</div>
+                      </td>
+                    )}
+                    <td className="px-3 py-2.5 font-extrabold text-[#111827] whitespace-nowrap">{t.ticker}</td>
+                    <td className="px-3 py-2.5 text-right font-black text-purple-600 whitespace-nowrap">{t.target}%</td>
+                    <td className="px-3 py-2.5 text-slate-500 text-xs">{t.why}</td>
+                    <td className="px-3 py-2.5 text-slate-400 text-xs">{t.risk}</td>
+                  </tr>
+                ))
+              )}
               <tr className="bg-slate-50 border-t border-slate-100">
                 <td
-                  className="px-4 py-3 font-black text-[#111827] text-xs uppercase tracking-wider"
+                  className="px-3 py-3 font-black text-[#111827] text-xs uppercase tracking-wider"
                   colSpan={2}
                 >
                   TOTAL
                 </td>
-                <td className="px-4 py-3 text-right font-black text-purple-600">100%</td>
+                <td className="px-3 py-3 text-right font-black text-purple-600">100%</td>
+                <td colSpan={2} />
               </tr>
             </tbody>
           </table>
